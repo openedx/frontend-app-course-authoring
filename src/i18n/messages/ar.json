@@ -1040,9 +1040,9 @@
   "course-authoring.course-unit.status.released.title": "RELEASED",
   "course-authoring.course-unit.status.scheduled.title": "SCHEDULED",
   "course-authoring.course-unit.xblock.button.edit.alt": "Edit Item",
-  "course-authoring.course-unit.xblock.button.copy.label": "Copy",
   "course-authoring.course-unit.xblock.button.duplicate.label": "Duplicate",
   "course-authoring.course-unit.xblock.button.move.label": "Move",
+  "course-authoring.course-unit.xblock.button.copyToClipboard.label": "Copy to clipboard",
   "course-authoring.course-unit.xblock.button.manageAccess.label": "Manage access",
   "course-authoring.course-unit.xblock.button.delete.label": "Delete",
   "course-authoring.group-configurations.heading-title": "Group configurations",
@@ -1076,5 +1076,16 @@
   "course-authoring.course-unit.modal.make-visibility.btn.action.text": "Make visible to students",
   "course-authoring.course-unit.modal.make-visibility.btn.cancel.text": "Cancel",
   "course-authoring.course-unit.modal.make-visibility.description": "If the unit was previously published and released to students, any changes you made to the unit when it was hidden will now be visible to students. Do you want to proceed?",
-  "course-authoring.course-unit.xblock.button.actions.alt": "Actions"
+  "course-authoring.course-unit.xblock.button.actions.alt": "Actions",
+  "course-authoring.course-unit.paste-component.btn.text": "Paste component",
+  "course-authoring.course-unit.popover.content.text": "From:",
+  "course-authoring.course-unit.paste-component.whats-in-clipboard.text": "What's in my clipboard?",
+  "course-authoring.course-unit.paste-notification.has-conflicting-errors.title": "Files need to be updated manually.",
+  "course-authoring.course-unit.paste-notification.has-conflicting-errors.description": "The following files must be updated manually for components to work as intended:",
+  "course-authoring.course-unit.paste-notification.has-conflicting-errors.button.text": "Upload files",
+  "course-authoring.course-unit.paste-notification.has-errors.title": "Some errors occurred",
+  "course-authoring.course-unit.paste-notification.has-errors.description": "The following required files could not be added to the course:",
+  "course-authoring.course-unit.paste-notification.has-new-files.title": "New file(s) added to Files & Uploads.",
+  "course-authoring.course-unit.paste-notification.has-new-files.description": "The following required files were imported to this course:",
+  "course-authoring.course-unit.paste-notification.has-new-files.button.text": "View files"
 }

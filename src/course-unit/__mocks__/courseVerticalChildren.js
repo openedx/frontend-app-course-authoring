@@ -12,4 +12,5 @@ module.exports = {
     },
   ],
   is_published: false,
+  canPasteComponent: true,
 };
