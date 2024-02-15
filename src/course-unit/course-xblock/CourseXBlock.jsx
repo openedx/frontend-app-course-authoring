@@ -9,6 +9,7 @@ import { useDispatch, useSelector } from 'react-redux';
 
 import { getCanEdit } from 'CourseAuthoring/course-unit/data/selectors';
 import DeleteModal from '../../generic/delete-modal/DeleteModal';
+import ConditionalSortableElement from '../../generic/drag-helper/ConditionalSortableElement';
 import { scrollToElement } from '../../course-outline/utils';
 import { copyToClipboard } from '../data/thunk';
 
@@ -37,7 +38,7 @@ const CourseXBlock = ({
 
   return (
     <div ref={courseXBlockElementRef} {...props}>
-      <Card className="mb-1">
+      <Card as={ConditionalSortableElement} id={id} draggable className="mb-1">
         <Card.Header
           title={title}
           actions={(
@@ -45,7 +46,6 @@ const CourseXBlock = ({
               <IconButton
                 alt={intl.formatMessage(messages.blockAltButtonEdit)}
                 iconAs={EditIcon}
-                size="md"
                 onClick={() => {}}
               />
               <Dropdown>
@@ -54,7 +54,6 @@ const CourseXBlock = ({
                   as={IconButton}
                   src={MoveVertIcon}
                   alt={intl.formatMessage(messages.blockActionsDropdownAlt)}
-                  size="sm"
                   iconAs={Icon}
                 />
                 <Dropdown.Menu>
@@ -85,7 +84,6 @@ const CourseXBlock = ({
               />
             </ActionRow>
           )}
-          size="md"
         />
         <Card.Section>
           <div className="w-100 bg-gray-100" style={{ height: 200 }} data-block-id={id} />

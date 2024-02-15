@@ -97,11 +97,18 @@ const PastNotificationAlert = ({ staticFileNotices, courseId }) => {
 
 PastNotificationAlert.propTypes = {
   courseId: PropTypes.string.isRequired,
-  staticFileNotices: PropTypes.shape({
-    conflictingFiles: PropTypes.arrayOf(PropTypes.string),
-    errorFiles: PropTypes.arrayOf(PropTypes.string),
-    newFiles: PropTypes.arrayOf(PropTypes.string),
-  }).isRequired,
+  staticFileNotices: PropTypes.oneOfType([
+    PropTypes.objectOf({
+      conflictingFiles: PropTypes.arrayOf(PropTypes.string),
+      errorFiles: PropTypes.arrayOf(PropTypes.string),
+      newFiles: PropTypes.arrayOf(PropTypes.string),
+    }),
+    PropTypes.arrayOf(PropTypes.string),
+  ]),
+};
+
+PastNotificationAlert.defaultProps = {
+  staticFileNotices: {},
 };
 
 export default PastNotificationAlert;

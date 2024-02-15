@@ -20,6 +20,7 @@ import {
   handleCourseUnitVisibilityAndData,
   deleteUnitItem,
   duplicateUnitItem,
+  setXBlockOrderList,
 } from './api';
 import {
   updateLoadingCourseUnitStatus,
@@ -38,6 +39,7 @@ import {
   deleteXBlock,
   duplicateXBlock,
   fetchStaticFileNoticesSuccess,
+  reorderXBlockList,
 } from './slice';
 import { getNotificationMessage } from './utils';
 
@@ -272,6 +274,29 @@ export function copyToClipboard(usageKey) {
     } catch (error) {
       dispatch(updateSavingStatus({ status: RequestStatus.FAILED }));
       logError('Error copying to clipboard:', error);
+    } finally {
+      dispatch(hideProcessingNotification());
+    }
+  };
+}
+
+export function setXBlockOrderListQuery(blockId, xblockListIds, restoreCallback) {
+  return async (dispatch) => {
+    dispatch(updateSavingStatus({ status: RequestStatus.PENDING }));
+    dispatch(showProcessingNotification(NOTIFICATION_MESSAGES.saving));
+
+    try {
+      await setXBlockOrderList(blockId, xblockListIds).then(async (result) => {
+        if (result) {
+          dispatch(reorderXBlockList(xblockListIds));
+          dispatch(updateSavingStatus({ status: RequestStatus.SUCCESSFUL }));
+          const courseUnit = await getCourseUnitData(blockId);
+          dispatch(fetchCourseItemSuccess(courseUnit));
+        }
+      });
+    } catch (error) {
+      restoreCallback();
+      dispatch(updateSavingStatus({ status: RequestStatus.FAILED }));
     } finally {
       dispatch(hideProcessingNotification());
     }
