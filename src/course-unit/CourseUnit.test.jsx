@@ -1020,7 +1020,9 @@ describe('<CourseUnit />', () => {
 
       userEvent.click(getByRole('button', { name: pasteComponentMessages.pasteComponentButtonText.defaultMessage }));
 
-      expect(getAllByTestId('course-xblock')).toHaveLength(2);
+      await waitFor(() => {
+        expect(getAllByTestId('course-xblock')).toHaveLength(2);
+      });
 
       axiosMock
         .onGet(getCourseVerticalChildrenApiUrl(blockId))
@@ -1097,9 +1099,11 @@ describe('<CourseUnit />', () => {
         courseUnitMock,
       ]);
 
-      units = getAllByTestId('course-unit-btn');
-      const courseUnits = courseSectionVerticalMock.xblock_info.ancestor_info.ancestors[0].child_info.children;
-      expect(units).toHaveLength(courseUnits.length);
+      await waitFor(() => {
+        units = getAllByTestId('course-unit-btn');
+        const courseUnits = courseSectionVerticalMock.xblock_info.ancestor_info.ancestors[0].child_info.children;
+        expect(units).toHaveLength(courseUnits.length);
+      });
 
       axiosMock
         .onPost(postXBlockBaseApiUrl(), postXBlockBody)
