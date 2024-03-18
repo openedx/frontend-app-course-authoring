@@ -133,6 +133,7 @@ const CourseUnit = ({ courseId }) => {
             <Layout.Element>
               {currentlyVisibleToStudents && (
                 <AlertMessage
+                  className="course-unit__alert"
                   title={intl.formatMessage(messages.alertUnpublishedVersion)}
                   variant="warning"
                   icon={WarningIcon}
@@ -144,7 +145,7 @@ const CourseUnit = ({ courseId }) => {
                   courseId={courseId}
                 />
               )}
-              <Stack gap={4} className="mb-4 course-unit__xblocks">
+              <Stack className="mb-4 course-unit__xblocks">
                 <DraggableList
                   itemList={unitXBlocks}
                   setState={setUnitXBlocks}
@@ -161,6 +162,7 @@ const CourseUnit = ({ courseId }) => {
                       shouldScroll={shouldScroll}
                       unitXBlockActions={unitXBlockActions}
                       data-testid="course-xblock"
+                      className="course-unit__xblock"
                       userPartitionInfo={userPartitionInfo}
                     />
                   ))}

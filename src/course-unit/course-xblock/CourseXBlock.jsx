@@ -38,11 +38,16 @@ const CourseXBlock = ({
 
   return (
     <div ref={courseXBlockElementRef} {...props}>
-      <Card as={ConditionalSortableElement} id={id} draggable className="mb-1">
+      <Card
+        as={ConditionalSortableElement}
+        id={id}
+        draggable
+        componentStyle={{ marginBottom: 0 }}
+      >
         <Card.Header
           title={title}
           actions={(
-            <ActionRow>
+            <ActionRow className="mr-2">
               <IconButton
                 alt={intl.formatMessage(messages.blockAltButtonEdit)}
                 iconAs={EditIcon}
