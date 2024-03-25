@@ -10,6 +10,7 @@ import {
   getLoadingStatuses,
   getSavingStatuses,
   getStudioHomeData,
+  getStudioHomeCoursesParams,
 } from './data/selectors';
 import { updateSavingStatuses } from './data/slice';
 
@@ -17,6 +18,8 @@ const useStudioHome = () => {
   const location = useLocation();
   const dispatch = useDispatch();
   const studioHomeData = useSelector(getStudioHomeData);
+  const studioHomeCoursesParams = useSelector(getStudioHomeCoursesParams);
+  const { isFiltered } = studioHomeCoursesParams;
   const newCourseData = useSelector(getCourseData);
   const { studioHomeLoadingStatus } = useSelector(getLoadingStatuses);
   const savingCreateRerunStatus = useSelector(getSavingStatus);
@@ -32,6 +35,33 @@ const useStudioHome = () => {
     dispatch(fetchStudioHomeData(location.search ?? ''));
     setShowNewCourseContainer(false);
   }, [location.search]);
+
+  useEffect(() => {
+    const {
+      currentPage,
+      search,
+      order,
+      archivedOnly,
+      activeOnly,
+    } = studioHomeCoursesParams;
+
+    if (isFiltered) {
+      dispatch(fetchStudioHomeData(location.search ?? '', false, {
+        page: currentPage,
+        order,
+        search,
+        archivedOnly,
+        activeOnly,
+      }));
+    }
+  }, [
+    studioHomeCoursesParams.currentPage,
+    studioHomeCoursesParams.search,
+    studioHomeCoursesParams.order,
+    studioHomeCoursesParams.archivedOnly,
+    studioHomeCoursesParams.activeOnly,
+    isFiltered,
+  ]);
 
   useEffect(() => {
     if (courseCreatorSavingStatus === RequestStatus.SUCCESSFUL) {
@@ -80,6 +110,7 @@ const useStudioHome = () => {
     courseCreatorSavingStatus,
     isShowOrganizationDropdown,
     hasAbilityToCreateNewCourse,
+    isFiltered,
     dispatch,
     setShowNewCourseContainer,
   };

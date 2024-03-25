@@ -1,7 +1,13 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
-import { ActionRow, Card, Hyperlink } from '@openedx/paragon';
+import {
+  Card,
+  Hyperlink,
+  Dropdown,
+  IconButton,
+} from '@openedx/paragon';
+import { MoreHoriz } from '@openedx/paragon/icons';
 import { injectIntl, intlShape } from '@edx/frontend-platform/i18n';
 import { getConfig } from '@edx/frontend-platform';
 
@@ -10,7 +16,16 @@ import { getStudioHomeData } from '../data/selectors';
 import messages from '../messages';
 
 const CardItem = ({
-  intl, displayName, lmsLink, rerunLink, org, number, run, isLibraries, url,
+  intl,
+  displayName,
+  lmsLink,
+  rerunLink,
+  org,
+  number,
+  run,
+  isLibraries,
+  courseKey,
+  url,
 }) => {
   const {
     allowCourseReruns,
@@ -24,6 +39,7 @@ const CardItem = ({
   const isShowRerunLink = allowCourseReruns
     && rerunCreatorStatus
     && courseCreatorStatus === COURSE_CREATOR_STATES.granted;
+  const hasDisplayName = displayName.trim().length ? displayName : courseKey;
 
   return (
     <Card className="card-item">
@@ -34,23 +50,32 @@ const CardItem = ({
             className="card-item-title"
             destination={courseUrl().toString()}
           >
-            {displayName}
+            {hasDisplayName}
           </Hyperlink>
         ) : (
           <span className="card-item-title">{displayName}</span>
         )}
         subtitle={subtitle}
         actions={showActions && (
-          <ActionRow>
-            {isShowRerunLink && (
-              <Hyperlink className="small" destination={rerunLink}>
-                {intl.formatMessage(messages.btnReRunText)}
-              </Hyperlink>
-            )}
-            <Hyperlink className="small ml-3" destination={lmsLink}>
-              {intl.formatMessage(messages.viewLiveBtnText)}
-            </Hyperlink>
-          </ActionRow>
+          <Dropdown>
+            <Dropdown.Toggle
+              as={IconButton}
+              iconAs={MoreHoriz}
+              variant="primary"
+              data-testid="toggle-dropdown"
+            />
+            <Dropdown.Menu>
+              {isShowRerunLink && (
+                <Dropdown.Item href={rerunLink}>
+                  {messages.btnReRunText.defaultMessage}
+                </Dropdown.Item>
+              )}
+              <Dropdown.Item href={lmsLink}>
+                {intl.formatMessage(messages.viewLiveBtnText)}
+              </Dropdown.Item>
+            </Dropdown.Menu>
+          </Dropdown>
+
         )}
       />
     </Card>
@@ -59,6 +84,7 @@ const CardItem = ({
 
 CardItem.defaultProps = {
   isLibraries: false,
+  courseKey: '',
   rerunLink: '',
   lmsLink: '',
   run: '',
@@ -74,6 +100,7 @@ CardItem.propTypes = {
   number: PropTypes.string.isRequired,
   url: PropTypes.string.isRequired,
   isLibraries: PropTypes.bool,
+  courseKey: PropTypes.string,
 };
 
 export default injectIntl(CardItem);

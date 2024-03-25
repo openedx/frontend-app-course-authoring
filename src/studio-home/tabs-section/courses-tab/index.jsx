@@ -2,15 +2,22 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { useSelector } from 'react-redux';
 import { useIntl } from '@edx/frontend-platform/i18n';
-import { Icon, Row } from '@openedx/paragon';
+import {
+  Icon,
+  Row,
+  Pagination,
+  Alert,
+  Button,
+} from '@openedx/paragon';
 import { Error } from '@openedx/paragon/icons';
 
 import { COURSE_CREATOR_STATES } from '../../../constants';
-import { getStudioHomeData } from '../../data/selectors';
+import { getStudioHomeData, getStudioHomeCoursesParams } from '../../data/selectors';
+import { updateStudioHomeCoursesCustomParams } from '../../data/slice';
 import CardItem from '../../card-item';
 import CollapsibleStateWithAction from '../../collapsible-state-with-action';
-import { sortAlphabeticallyArray } from '../utils';
 import ContactAdministrator from './contact-administrator';
+import CoursesFilters from './courses-filters';
 import ProcessingCourses from '../../processing-courses';
 import { LoadingSpinner } from '../../../generic/Loading';
 import AlertMessage from '../../../generic/alert-message';
@@ -23,12 +30,23 @@ const CoursesTab = ({
   isShowProcessing,
   isLoading,
   isFailed,
+  dispatch,
+  numPages,
+  coursesCount,
 }) => {
   const intl = useIntl();
   const {
     courseCreatorStatus,
     optimizationEnabled,
   } = useSelector(getStudioHomeData);
+  const {
+    currentPage,
+    search,
+    order,
+    isFiltered,
+    archivedOnly,
+    activeOnly,
+  } = useSelector(getStudioHomeCoursesParams);
   const hasAbilityToCreateCourse = courseCreatorStatus === COURSE_CREATOR_STATES.granted;
   const showCollapsible = [
     COURSE_CREATOR_STATES.denied,
@@ -36,7 +54,32 @@ const CoursesTab = ({
     COURSE_CREATOR_STATES.unrequested,
   ].includes(courseCreatorStatus);
 
-  if (isLoading) {
+  const handlePageSelected = (page) => {
+    dispatch(updateStudioHomeCoursesCustomParams({
+      currentPage: page,
+      search,
+      order,
+      isFiltered: true,
+      archivedOnly,
+      activeOnly,
+    }));
+  };
+
+  const handleCleanFilters = () => {
+    dispatch(updateStudioHomeCoursesCustomParams({
+      currentPage: 1,
+      search: undefined,
+      order: 'display_name',
+      isFiltered: true,
+      cleanFilters: true,
+    }));
+  };
+
+  const hasCourses = coursesDataItems?.length;
+
+  const isNotFilteringCourses = !isFiltered && !isLoading;
+
+  if (isLoading && !isFiltered) {
     return (
       <Row className="m-0 mt-4 justify-content-center">
         <LoadingSpinner />
@@ -45,7 +88,7 @@ const CoursesTab = ({
   }
 
   return (
-    isFailed ? (
+    isFailed && !isFiltered ? (
       <AlertMessage
         variant="danger"
         description={(
@@ -58,37 +101,84 @@ const CoursesTab = ({
     ) : (
       <>
         {isShowProcessing && <ProcessingCourses />}
-        {coursesDataItems?.length ? (
-          sortAlphabeticallyArray(coursesDataItems).map(
-            ({
-              courseKey,
-              displayName,
-              lmsLink,
-              org,
-              rerunLink,
-              number,
-              run,
-              url,
-            }) => (
-              <CardItem
-                key={courseKey}
-                displayName={displayName}
-                lmsLink={lmsLink}
-                rerunLink={rerunLink}
-                org={org}
-                number={number}
-                run={run}
-                url={url}
+        <div className="d-flex flex-row justify-content-between my-4">
+          <CoursesFilters dispatch={dispatch} />
+          {!isLoading && (
+            <div className="d-flex">
+              <p data-testid="pagination-info">
+                {intl.formatMessage(messages.coursesPaginationInfo, {
+                  length: coursesDataItems?.length ?? 0,
+                  total: coursesCount || 0,
+                })}
+              </p>
+            </div>
+          )}
+        </div>
+        {hasCourses ? (
+          <>
+            {coursesDataItems.map(
+              ({
+                courseKey,
+                displayName,
+                lmsLink,
+                org,
+                rerunLink,
+                number,
+                run,
+                url,
+                cmsLink,
+              }) => (
+                <CardItem
+                  key={courseKey}
+                  courseKey={courseKey}
+                  displayName={displayName}
+                  lmsLink={lmsLink}
+                  rerunLink={rerunLink}
+                  org={org}
+                  number={number}
+                  run={run}
+                  url={url}
+                  cmsLink={cmsLink}
+                />
+              ),
+            )}
+
+            {numPages > 1 && (
+              <Pagination
+                className="d-flex justify-content-center"
+                paginationLabel="pagination navigation"
+                pageCount={numPages}
+                currentPage={currentPage}
+                onPageSelect={handlePageSelected}
               />
-            ),
-          )
-        ) : (!optimizationEnabled && (
+            )}
+          </>
+        ) : (!optimizationEnabled && isNotFilteringCourses && (
           <ContactAdministrator
             hasAbilityToCreateCourse={hasAbilityToCreateCourse}
             showNewCourseContainer={showNewCourseContainer}
             onClickNewCourse={onClickNewCourse}
           />
         )
+        )}
+
+        {isLoading && isFiltered && (
+          <Row className="m-0 mt-4 justify-content-start">
+            <LoadingSpinner />
+          </Row>
+        )}
+        {isFiltered && !hasCourses && !isLoading && (
+          <Alert className="mt-4">
+            <Alert.Heading>
+              {intl.formatMessage(messages.coursesTabCourseNotFoundAlertTitle)}
+            </Alert.Heading>
+            <p>
+              {intl.formatMessage(messages.coursesTabCourseNotFoundAlertMessage)}
+            </p>
+            <Button variant="primary" onClick={handleCleanFilters}>
+              {intl.formatMessage(messages.coursesTabCourseNotFoundAlertCleanFiltersButton)}
+            </Button>
+          </Alert>
         )}
         {showCollapsible && (
           <CollapsibleStateWithAction
@@ -99,6 +189,10 @@ const CoursesTab = ({
       </>
     )
   );
+};
+
+CoursesTab.defaultProps = {
+  numPages: 0,
 };
 
 CoursesTab.propTypes = {
@@ -119,6 +213,9 @@ CoursesTab.propTypes = {
   isShowProcessing: PropTypes.bool.isRequired,
   isLoading: PropTypes.bool.isRequired,
   isFailed: PropTypes.bool.isRequired,
+  dispatch: PropTypes.func.isRequired,
+  numPages: PropTypes.number,
+  coursesCount: PropTypes.number.isRequired,
 };
 
 export default CoursesTab;
