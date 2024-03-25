@@ -10,13 +10,15 @@ import {
   getLoadingStatuses,
   getSavingStatuses,
   getStudioHomeData,
+  getStudioHomeCoursesParams,
 } from './data/selectors';
 import { updateSavingStatuses } from './data/slice';
 
-const useStudioHome = () => {
+const useStudioHome = (isPaginated = false) => {
   const location = useLocation();
   const dispatch = useDispatch();
   const studioHomeData = useSelector(getStudioHomeData);
+  const studioHomeCoursesParams = useSelector(getStudioHomeCoursesParams);
   const newCourseData = useSelector(getCourseData);
   const { studioHomeLoadingStatus } = useSelector(getLoadingStatuses);
   const savingCreateRerunStatus = useSelector(getSavingStatus);
@@ -29,9 +31,18 @@ const useStudioHome = () => {
   const isFailedLoadingPage = studioHomeLoadingStatus === RequestStatus.FAILED;
 
   useEffect(() => {
-    dispatch(fetchStudioHomeData(location.search ?? ''));
-    setShowNewCourseContainer(false);
+    if (!isPaginated) {
+      dispatch(fetchStudioHomeData(location.search ?? ''));
+      setShowNewCourseContainer(false);
+    }
   }, [location.search]);
+
+  useEffect(() => {
+    if (isPaginated) {
+      const { currentPage } = studioHomeCoursesParams;
+      dispatch(fetchStudioHomeData(location.search ?? '', false, { page: currentPage }, true));
+    }
+  }, [studioHomeCoursesParams.currentPage]);
 
   useEffect(() => {
     if (courseCreatorSavingStatus === RequestStatus.SUCCESSFUL) {
