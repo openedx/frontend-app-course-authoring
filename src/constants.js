@@ -49,3 +49,5 @@ export const DECODED_ROUTES = {
     '/container/:blockId',
   ],
 };
+
+export const UPLOAD_FILE_MAX_SIZE = 20 * 1024 * 1024; // 100mb
