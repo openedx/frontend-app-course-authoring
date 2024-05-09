@@ -18,6 +18,7 @@ import {
   deleteUnitItem,
   duplicateUnitItem,
   setXBlockOrderList,
+  rollbackUnitItem,
 } from './api';
 import {
   updateLoadingCourseUnitStatus,
@@ -28,7 +29,6 @@ import {
   fetchSequenceSuccess,
   fetchCourseSectionVerticalDataSuccess,
   updateLoadingCourseSectionVerticalDataStatus,
-  updateLoadingCourseXblockStatus,
   updateCourseVerticalChildren,
   updateCourseVerticalChildrenLoadingStatus,
   updateQueryPendingStatus,
@@ -36,6 +36,7 @@ import {
   duplicateXBlock,
   fetchStaticFileNoticesSuccess,
   reorderXBlockList,
+  updateMovedXBlockParams,
 } from './slice';
 import { getNotificationMessage } from './utils';
 
@@ -145,7 +146,6 @@ export function editCourseUnitVisibilityAndData(itemId, type, isVisible, groupAc
 
 export function createNewCourseXBlock(body, callback, blockId) {
   return async (dispatch) => {
-    dispatch(updateLoadingCourseXblockStatus({ status: RequestStatus.IN_PROGRESS }));
     dispatch(updateSavingStatus({ status: RequestStatus.PENDING }));
 
     if (body.stagedContent) {
@@ -173,7 +173,6 @@ export function createNewCourseXBlock(body, callback, blockId) {
           const courseVerticalChildrenData = await getCourseVerticalChildren(blockId);
           dispatch(updateCourseVerticalChildren(courseVerticalChildrenData));
           dispatch(hideProcessingNotification());
-          dispatch(updateLoadingCourseXblockStatus({ status: RequestStatus.SUCCESSFUL }));
           dispatch(updateSavingStatus({ status: RequestStatus.SUCCESSFUL }));
           if (callback) {
             callback(result);
@@ -185,7 +184,6 @@ export function createNewCourseXBlock(body, callback, blockId) {
       });
     } catch (error) {
       dispatch(hideProcessingNotification());
-      dispatch(updateLoadingCourseXblockStatus({ status: RequestStatus.FAILED }));
       dispatch(updateSavingStatus({ status: RequestStatus.FAILED }));
     }
   };
@@ -238,6 +236,27 @@ export function duplicateUnitItemQuery(itemId, xblockId) {
         newId: locator,
         newCourseVerticalChildren,
       }));
+      const courseUnit = await getCourseUnitData(itemId);
+      dispatch(fetchCourseItemSuccess(courseUnit));
+      dispatch(hideProcessingNotification());
+      dispatch(updateSavingStatus({ status: RequestStatus.SUCCESSFUL }));
+    } catch (error) {
+      dispatch(hideProcessingNotification());
+      dispatch(updateSavingStatus({ status: RequestStatus.FAILED }));
+    }
+  };
+}
+
+export function rollbackUnitItemQuery(itemId, xblockId, title) {
+  return async (dispatch) => {
+    dispatch(updateSavingStatus({ status: RequestStatus.PENDING }));
+    dispatch(showProcessingNotification(NOTIFICATION_MESSAGES.undoMoving));
+
+    try {
+      await rollbackUnitItem(itemId, xblockId);
+      const newCourseVerticalChildren = await getCourseVerticalChildren(itemId);
+      dispatch(updateCourseVerticalChildren(newCourseVerticalChildren));
+      dispatch(updateMovedXBlockParams({ title, isSuccess: true, isUndo: true }));
       const courseUnit = await getCourseUnitData(itemId);
       dispatch(fetchCourseItemSuccess(courseUnit));
       dispatch(hideProcessingNotification());

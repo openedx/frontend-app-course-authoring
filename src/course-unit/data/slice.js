@@ -10,6 +10,13 @@ const slice = createSlice({
     isQueryPending: false,
     isTitleEditFormOpen: false,
     canEdit: true,
+    movedXBlockParams: {
+      isSuccess: false,
+      isUndo: false,
+      title: '',
+      sourceLocator: '',
+      targetParentLocator: '',
+    },
     loadingStatus: {
       fetchUnitLoadingStatus: RequestStatus.IN_PROGRESS,
       courseSectionVerticalLoadingStatus: RequestStatus.IN_PROGRESS,
@@ -32,6 +39,9 @@ const slice = createSlice({
     },
     updateQueryPendingStatus: (state, { payload }) => {
       state.isQueryPending = payload;
+    },
+    updateMovedXBlockParams: (state, { payload }) => {
+      state.movedXBlockParams = { ...state.movedXBlockParams, ...payload };
     },
     changeEditTitleFormOpen: (state, { payload }) => {
       state.isTitleEditFormOpen = payload;
@@ -61,12 +71,6 @@ const slice = createSlice({
       state.loadingStatus = {
         ...state.loadingStatus,
         courseSectionVerticalLoadingStatus: payload.status,
-      };
-    },
-    updateLoadingCourseXblockStatus: (state, { payload }) => {
-      state.loadingStatus = {
-        ...state.loadingStatus,
-        createUnitXblockLoadingStatus: payload.status,
       };
     },
     addNewUnitStatus: (state, { payload }) => {
@@ -123,13 +127,13 @@ export const {
   updateLoadingCourseSectionVerticalDataStatus,
   changeEditTitleFormOpen,
   updateQueryPendingStatus,
-  updateLoadingCourseXblockStatus,
   updateCourseVerticalChildren,
   updateCourseVerticalChildrenLoadingStatus,
   deleteXBlock,
   duplicateXBlock,
   fetchStaticFileNoticesSuccess,
   reorderXBlockList,
+  updateMovedXBlockParams,
 } = slice.actions;
 
 export const {
