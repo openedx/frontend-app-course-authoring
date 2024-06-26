@@ -34,16 +34,16 @@ export const useContentSearchConnection = () => (
  * @param {string} [context.indexName] Which search index contains the content data
  * @param {import('meilisearch').Filter} [context.extraFilter] Other filters to apply to the search, e.g. course ID
  * @param {string} context.searchKeywords The keywords that the user is searching for, if any
- * @param {string[]} context.blockTypesFilter Only search for these block types (e.g. ["html", "problem"])
- * @param {string[]} context.tagsFilter Required tags (all must match), e.g. ["Difficulty > Hard", "Subject > Math"]
+ * @param {string[]} [context.blockTypesFilter] Only search for these block types (e.g. ["html", "problem"])
+ * @param {string[]} [context.tagsFilter] Required tags (all must match), e.g. ["Difficulty > Hard", "Subject > Math"]
  */
 export const useContentSearchResults = ({
   client,
   indexName,
   extraFilter,
   searchKeywords,
-  blockTypesFilter,
-  tagsFilter,
+  blockTypesFilter = [],
+  tagsFilter = [],
 }) => {
   const query = useInfiniteQuery({
     enabled: client !== undefined && indexName !== undefined,

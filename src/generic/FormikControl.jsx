@@ -9,8 +9,8 @@ const FormikControl = ({
   name,
   label,
   help,
-  className,
-  controlClasses,
+  className = FormikControl.defaultProps.className,
+  controlClasses = FormikControl.defaultProps.controlClasses,
   ...params
 }) => {
   const {
