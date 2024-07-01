@@ -56,11 +56,6 @@ const messages = defineMessages({
     defaultMessage: 'This is a placeholder for the create library form. This will be replaced with the actual form.',
     description: 'Temp placeholder for the create library container. This will be replaced with the new library form.',
   },
-  addContentTitle: {
-    id: 'course-authoring.library-authoring.drawer.title.add-content',
-    defaultMessage: 'Add Content',
-    description: 'Title of add content in library container.',
-  },
   newContentButton: {
     id: 'course-authoring.library-authoring.buttons.new-content.text',
     defaultMessage: 'New',
