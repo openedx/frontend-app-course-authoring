@@ -28,7 +28,7 @@ import mockTagsFacetResultLevel0 from './__mocks__/facet-search-level0.json';
 import mockTagsFacetResultLevel1 from './__mocks__/facet-search-level1.json';
 import mockTagsKeywordSearchResult from './__mocks__/tags-keyword-search.json';
 import SearchUI from './SearchUI';
-import { getContentSearchConfigUrl } from './data/api';
+import { getContentSearchConfigUrl } from '../search-manager/data/api';
 
 // mockResult contains only a single result - this one:
 const mockResultDisplayName = 'Test HTML Block';
@@ -342,9 +342,10 @@ describe('<SearchUI />', () => {
       window.location = location;
     });
 
-    test('click lib component result doesnt navigates to the context withou libraryAuthoringMfe', async () => {
+    test('click lib component result navigates to course-authoring/library without libraryAuthoringMfe', async () => {
       const data = generateGetStudioHomeDataApiResponse();
       data.redirectToLibraryAuthoringMfe = false;
+      data.libraryAuthoringMfeUrl = '';
       axiosMock.onGet(getStudioHomeApiUrl()).reply(200, data);
 
       await executeThunk(fetchStudioHomeData(), store.dispatch);
@@ -354,18 +355,21 @@ describe('<SearchUI />', () => {
       const resultItem = await findByRole('button', { name: /Library Content/ });
 
       // Clicking the "Open in new window" button should open the result in a new window:
-      const { open, location } = window;
+      const { open } = window;
       window.open = jest.fn();
       fireEvent.click(within(resultItem).getByRole('button', { name: 'Open in new window' }));
-      expect(window.open).not.toHaveBeenCalled();
+
+      expect(window.open).toHaveBeenCalledWith(
+        '/library/lib:org1:libafter1',
+        '_blank',
+      );
       window.open = open;
 
-      // @ts-ignore
-      window.location = { href: '' };
       // Clicking in the result should navigate to the result's URL:
       fireEvent.click(resultItem);
-      expect(window.location.href === location.href);
-      window.location = location;
+      expect(mockNavigate).toHaveBeenCalledWith(
+        '/library/lib:org1:libafter1',
+      );
     });
   });
 
@@ -410,7 +414,9 @@ describe('<SearchUI />', () => {
       const popupMenu = getByRole('group');
       const problemFilterCheckbox = getByLabelTextIn(popupMenu, /Problem/i);
       fireEvent.click(problemFilterCheckbox, {});
-      await waitFor(() => { expect(rendered.getByText('Type: Problem')).toBeInTheDocument(); });
+      await waitFor(() => {
+        expect(rendered.getByRole('button', { name: /type: problem/i, hidden: true })).toBeInTheDocument();
+      });
       // Now wait for the filter to be applied and the new results to be fetched.
       await waitFor(() => { expect(fetchMock).toHaveFetchedTimes(3, searchEndpoint, 'post'); });
       // Because we're mocking the results, there's no actual changes to the mock results,
