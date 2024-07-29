@@ -9,6 +9,7 @@ import {
   commitLibraryChanges,
   revertLibraryChanges,
   updateLibraryMetadata,
+  libraryPasteClipboard,
 } from './api';
 
 export const libraryAuthoringQueryKeys = {
@@ -101,6 +102,17 @@ export const useRevertLibraryChanges = () => {
     mutationFn: revertLibraryChanges,
     onSettled: (_data, _error, libraryId) => {
       queryClient.invalidateQueries({ queryKey: libraryAuthoringQueryKeys.contentLibrary(libraryId) });
+    },
+  });
+};
+
+export const useLibraryPasteClipboard = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: libraryPasteClipboard,
+    onSettled: (_data, _error, variables) => {
+      queryClient.invalidateQueries({ queryKey: libraryAuthoringQueryKeys.contentLibrary(variables.libraryId) });
+      queryClient.invalidateQueries({ queryKey: ['content_search'] });
     },
   });
 };
