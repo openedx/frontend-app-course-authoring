@@ -88,7 +88,7 @@
     "start": "^5.1.0",
     "universal-cookie": "^4.0.4",
     "uuid": "^3.4.0",
-    "yup": "0.31.1"
+    "yup": "0.32.11"
   },
   "devDependencies": {
     "@edx/browserslist-config": "1.2.0",
