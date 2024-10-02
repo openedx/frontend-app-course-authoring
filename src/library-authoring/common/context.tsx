@@ -11,6 +11,8 @@ export enum SidebarBodyComponentId {
 export interface LibraryContextData {
   /** The ID of the current library */
   libraryId: string;
+  // Whether we're in "component picker" mode
+  componentPickerMode: boolean;
   // Sidebar stuff - only one sidebar is active at any given time:
   sidebarBodyComponent: SidebarBodyComponentId | null;
   closeLibrarySidebar: () => void;
@@ -37,10 +39,16 @@ export interface LibraryContextData {
  */
 const LibraryContext = React.createContext<LibraryContextData | undefined>(undefined);
 
+interface LibraryProviderProps {
+  children?: React.ReactNode;
+  libraryId: string;
+  componentPickerMode?: boolean;
+}
+
 /**
  * React component to provide `LibraryContext`
  */
-export const LibraryProvider = (props: { children?: React.ReactNode, libraryId: string }) => {
+export const LibraryProvider = ({ children, libraryId, componentPickerMode = false }: LibraryProviderProps) => {
   const [sidebarBodyComponent, setSidebarBodyComponent] = React.useState<SidebarBodyComponentId | null>(null);
   const [currentComponentUsageKey, setCurrentComponentUsageKey] = React.useState<string>();
   const [currentCollectionId, setcurrentCollectionId] = React.useState<string>();
@@ -79,7 +87,8 @@ export const LibraryProvider = (props: { children?: React.ReactNode, libraryId: 
   }, []);
 
   const context = React.useMemo<LibraryContextData>(() => ({
-    libraryId: props.libraryId,
+    libraryId,
+    componentPickerMode,
     sidebarBodyComponent,
     closeLibrarySidebar,
     openAddContentSidebar,
@@ -92,7 +101,8 @@ export const LibraryProvider = (props: { children?: React.ReactNode, libraryId: 
     openCollectionInfoSidebar,
     currentCollectionId,
   }), [
-    props.libraryId,
+    libraryId,
+    componentPickerMode,
     sidebarBodyComponent,
     closeLibrarySidebar,
     openAddContentSidebar,
@@ -108,7 +118,7 @@ export const LibraryProvider = (props: { children?: React.ReactNode, libraryId: 
 
   return (
     <LibraryContext.Provider value={context}>
-      {props.children}
+      {children}
     </LibraryContext.Provider>
   );
 };

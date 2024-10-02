@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet';
 import classNames from 'classnames';
 import { StudioFooter } from '@edx/frontend-component-footer';
@@ -13,7 +13,9 @@ import {
 } from '@openedx/paragon';
 import { Add, InfoOutline } from '@openedx/paragon/icons';
 import {
-  Routes, Route, useLocation, useNavigate, useSearchParams,
+  useLocation,
+  useNavigate,
+  useSearchParams,
 } from 'react-router-dom';
 
 import Loading from '../generic/Loading';
@@ -49,6 +51,7 @@ interface HeaderActionsProps {
 const HeaderActions = ({ canEditLibrary }: HeaderActionsProps) => {
   const intl = useIntl();
   const {
+    componentPickerMode,
     openAddContentSidebar,
     openInfoSidebar,
     closeLibrarySidebar,
@@ -84,26 +87,28 @@ const HeaderActions = ({ canEditLibrary }: HeaderActionsProps) => {
       >
         {intl.formatMessage(messages.libraryInfoButton)}
       </Button>
-      <Button
-        className="ml-1"
-        iconBefore={Add}
-        variant="primary rounded-0"
-        onClick={openAddContentSidebar}
-        disabled={!canEditLibrary}
-      >
-        {intl.formatMessage(messages.newContentButton)}
-      </Button>
+      {!componentPickerMode && (
+        <Button
+          className="ml-1"
+          iconBefore={Add}
+          variant="primary rounded-0"
+          onClick={openAddContentSidebar}
+          disabled={!canEditLibrary}
+        >
+          {intl.formatMessage(messages.newContentButton)}
+        </Button>
+      )}
     </div>
   );
 };
 
-const SubHeaderTitle = ({ title, canEditLibrary }: { title: string, canEditLibrary: boolean }) => {
+const SubHeaderTitle = ({ title, showReadOnlyBadge }: { title: string, showReadOnlyBadge: boolean }) => {
   const intl = useIntl();
 
   return (
     <Stack direction="vertical">
       {title}
-      { !canEditLibrary && (
+      {showReadOnlyBadge && (
         <div>
           <Badge variant="primary" style={{ fontSize: '50%' }}>
             {intl.formatMessage(messages.readOnlyBadge)}
@@ -114,23 +119,38 @@ const SubHeaderTitle = ({ title, canEditLibrary }: { title: string, canEditLibra
   );
 };
 
-const LibraryAuthoringPage = () => {
+interface LibraryAuthoringPageProps {
+  libraryId?: string;
+  componentPicker?: boolean;
+}
+
+const LibraryAuthoringPage = (props: LibraryAuthoringPageProps) => {
   const intl = useIntl();
   const location = useLocation();
   const navigate = useNavigate();
 
-  const { libraryId } = useLibraryContext();
-  const { data: libraryData, isLoading } = useContentLibrary(libraryId);
-
-  const currentPath = location.pathname.split('/').pop();
-  const activeKey = (currentPath && currentPath in TabList) ? TabList[currentPath] : TabList.home;
   const {
+    libraryId,
+    componentPickerMode,
     sidebarBodyComponent,
     openInfoSidebar,
   } = useLibraryContext();
+  const { data: libraryData, isLoading } = useContentLibrary(libraryId);
+
+  const currentPath = location.pathname.split('/').pop();
+  let initialActiveKey: string | undefined;
+  if (componentPickerMode || currentPath === libraryId) {
+    initialActiveKey = TabList.home;
+  } else if (currentPath && currentPath in TabList) {
+    initialActiveKey = TabList[currentPath];
+  }
+
+  const [activeKey, setActiveKey] = useState<string | undefined>(initialActiveKey);
 
   useEffect(() => {
-    openInfoSidebar();
+    if (!componentPickerMode) {
+      openInfoSidebar();
+    }
   }, []);
 
   const [searchParams] = useSearchParams();
@@ -139,11 +159,19 @@ const LibraryAuthoringPage = () => {
     return <Loading />;
   }
 
+  if (activeKey === undefined) {
+    return <NotFoundAlert />;
+  }
+
   if (!libraryData) {
     return <NotFoundAlert />;
   }
 
   const handleTabChange = (key: string) => {
+    if (componentPickerMode) {
+      setActiveKey(key);
+      return;
+    }
     navigate({
       pathname: key,
       search: searchParams.toString(),
@@ -154,24 +182,33 @@ const LibraryAuthoringPage = () => {
     <div className="d-flex">
       <div className="flex-grow-1">
         <Helmet><title>{libraryData.title} | {process.env.SITE_NAME}</title></Helmet>
-        <Header
-          number={libraryData.slug}
-          title={libraryData.title}
-          org={libraryData.org}
-          contextId={libraryId}
-          isLibrary
-          containerProps={{
-            size: undefined,
-          }}
-        />
+        {!componentPickerMode && (
+          <Header
+            number={libraryData.slug}
+            title={libraryData.title}
+            org={libraryData.org}
+            contextId={libraryId}
+            isLibrary
+            containerProps={{
+              size: undefined,
+            }}
+          />
+        )}
         <Container className="px-4 mt-4 mb-5 library-authoring-page">
           <SearchContextProvider
             extraFilter={`context_key = "${libraryId}"`}
           >
             <SubHeader
-              title={<SubHeaderTitle title={libraryData.title} canEditLibrary={libraryData.canEditLibrary} />}
+              title={(
+                <SubHeaderTitle
+                  title={libraryData.title}
+                  showReadOnlyBadge={!componentPickerMode && !libraryData.canEditLibrary}
+                />
+              )}
               subtitle={intl.formatMessage(messages.headingSubtitle)}
-              headerActions={<HeaderActions canEditLibrary={libraryData.canEditLibrary} />}
+              headerActions={(
+                <HeaderActions canEditLibrary={libraryData.canEditLibrary} />
+              )}
             />
             <SearchKeywordsField className="w-50" />
             <div className="d-flex mt-3 align-items-center">
@@ -187,35 +224,28 @@ const LibraryAuthoringPage = () => {
               onSelect={handleTabChange}
               className="my-3"
             >
-              <Tab eventKey={TabList.home} title={intl.formatMessage(messages.homeTab)} />
-              <Tab eventKey={TabList.components} title={intl.formatMessage(messages.componentsTab)} />
-              <Tab eventKey={TabList.collections} title={intl.formatMessage(messages.collectionsTab)} />
+              <Tab eventKey={TabList.home} title={intl.formatMessage(messages.homeTab)}>
+                <LibraryHome
+                  tabList={TabList}
+                  handleTabChange={handleTabChange}
+                />
+              </Tab>
+              <Tab eventKey={TabList.components} title={intl.formatMessage(messages.componentsTab)}>
+                <LibraryComponents
+                  variant="full"
+                />
+              </Tab>
+              <Tab eventKey={TabList.collections} title={intl.formatMessage(messages.collectionsTab)}>
+                <LibraryCollections
+                  variant="full"
+                />
+              </Tab>
             </Tabs>
-            <Routes>
-              <Route
-                path={TabList.home}
-                element={(
-                  <LibraryHome tabList={TabList} handleTabChange={handleTabChange} />
-                )}
-              />
-              <Route
-                path={TabList.components}
-                element={<LibraryComponents variant="full" />}
-              />
-              <Route
-                path={TabList.collections}
-                element={<LibraryCollections variant="full" />}
-              />
-              <Route
-                path="*"
-                element={<NotFoundAlert />}
-              />
-            </Routes>
           </SearchContextProvider>
         </Container>
-        <StudioFooter containerProps={{ size: undefined }} />
+        {!componentPickerMode && <StudioFooter containerProps={{ size: undefined }} />}
       </div>
-      { !!sidebarBodyComponent && (
+      {!!sidebarBodyComponent && (
         <div className="library-authoring-sidebar box-shadow-left-1 bg-white" data-testid="library-sidebar">
           <LibrarySidebar library={libraryData} />
         </div>
