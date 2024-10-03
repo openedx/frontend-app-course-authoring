@@ -1,6 +1,9 @@
 import { useToggle } from '@openedx/paragon';
 import React from 'react';
 
+import type { ContentLibrary } from '../data/api';
+import { useContentLibrary } from '../data/apiHooks';
+
 export enum SidebarBodyComponentId {
   AddContent = 'add-content',
   Info = 'info',
@@ -11,6 +14,9 @@ export enum SidebarBodyComponentId {
 export interface LibraryContextData {
   /** The ID of the current library */
   libraryId: string;
+  libraryData?: ContentLibrary;
+  readOnly: boolean;
+  isLoadingLibraryData: boolean;
   // Whether we're in "component picker" mode
   componentPickerMode: boolean;
   // Sidebar stuff - only one sidebar is active at any given time:
@@ -43,15 +49,23 @@ interface LibraryProviderProps {
   children?: React.ReactNode;
   libraryId: string;
   componentPickerMode?: boolean;
+  collectionId?: string;
+  componentUsageKey?: string;
 }
 
 /**
  * React component to provide `LibraryContext`
  */
-export const LibraryProvider = ({ children, libraryId, componentPickerMode = false }: LibraryProviderProps) => {
+export const LibraryProvider = ({
+  children,
+  libraryId,
+  componentPickerMode = false,
+  collectionId,
+  componentUsageKey,
+}: LibraryProviderProps) => {
   const [sidebarBodyComponent, setSidebarBodyComponent] = React.useState<SidebarBodyComponentId | null>(null);
-  const [currentComponentUsageKey, setCurrentComponentUsageKey] = React.useState<string>();
-  const [currentCollectionId, setcurrentCollectionId] = React.useState<string>();
+  const [currentComponentUsageKey, setCurrentComponentUsageKey] = React.useState<string | undefined>(componentUsageKey);
+  const [currentCollectionId, setcurrentCollectionId] = React.useState<string | undefined>(collectionId);
   const [isCreateCollectionModalOpen, openCreateCollectionModal, closeCreateCollectionModal] = useToggle(false);
 
   const resetSidebar = React.useCallback(() => {
@@ -86,8 +100,15 @@ export const LibraryProvider = ({ children, libraryId, componentPickerMode = fal
     setSidebarBodyComponent(SidebarBodyComponentId.CollectionInfo);
   }, []);
 
+  const { data: libraryData, isLoading: isLoadingLibraryData } = useContentLibrary(libraryId);
+
+  const readOnly = componentPickerMode || !libraryData?.canEditLibrary;
+
   const context = React.useMemo<LibraryContextData>(() => ({
     libraryId,
+    libraryData,
+    readOnly,
+    isLoadingLibraryData,
     componentPickerMode,
     sidebarBodyComponent,
     closeLibrarySidebar,
@@ -102,6 +123,9 @@ export const LibraryProvider = ({ children, libraryId, componentPickerMode = fal
     currentCollectionId,
   }), [
     libraryId,
+    libraryData,
+    readOnly,
+    isLoadingLibraryData,
     componentPickerMode,
     sidebarBodyComponent,
     closeLibrarySidebar,

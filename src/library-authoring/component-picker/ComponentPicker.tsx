@@ -1,19 +1,17 @@
+import { useIntl } from '@edx/frontend-platform/i18n';
 import { Button, Stepper } from '@openedx/paragon';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 import { LibraryProvider } from '../common/context';
 import LibraryAuthoringPage from '../LibraryAuthoringPage';
 import SelectLibrary from './SelectLibrary';
+import messages from './messages';
 
 const ComponentPicker = () => {
+  const intl = useIntl();
+
   const [currentStep, setCurrentStep] = useState('select-library');
   const [selectedLibrary, setSelectedLibrary] = useState('');
-
-  useEffect(() => {
-    if (selectedLibrary) {
-      console.log('Selected library:', selectedLibrary);
-    }
-  });
 
   return (
     <Stepper
@@ -31,19 +29,16 @@ const ComponentPicker = () => {
 
       <div className="py-3">
         <Stepper.ActionRow eventKey="select-library">
-          <Button variant="outline-primary" onClick={() => alert('Cancel')}>
-            Cancel
-          </Button>
           <Stepper.ActionRow.Spacer />
-          <Button onClick={() => setCurrentStep('pick-components')}>Next</Button>
+          <Button onClick={() => setCurrentStep('pick-components')}>
+            {intl.formatMessage(messages.selectLibraryNextButton)}
+          </Button>
         </Stepper.ActionRow>
 
         <Stepper.ActionRow eventKey="pick-components">
           <Button variant="outline-primary" onClick={() => setCurrentStep('select-library')}>
-            Previous
+            {intl.formatMessage(messages.pickComponentPreviousButton)}
           </Button>
-          <Stepper.ActionRow.Spacer />
-          <Button onClick={() => alert('Completed')}>Close</Button>
         </Stepper.ActionRow>
       </div>
     </Stepper>

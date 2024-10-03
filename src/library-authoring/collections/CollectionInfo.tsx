@@ -7,19 +7,21 @@ import {
 } from '@openedx/paragon';
 import { Link, useMatch } from 'react-router-dom';
 
-import type { ContentLibrary } from '../data/api';
+import { useLibraryContext } from '../common/context';
 import CollectionDetails from './CollectionDetails';
 import messages from './messages';
 
-interface CollectionInfoProps {
-  library: ContentLibrary,
-  collectionId: string,
-}
-
-const CollectionInfo = ({ library, collectionId }: CollectionInfoProps) => {
+const CollectionInfo = () => {
   const intl = useIntl();
-  const url = `/library/${library.id}/collection/${collectionId}/`;
+
+  const { libraryId, currentCollectionId: collectionId } = useLibraryContext();
+
+  const url = `/library/${libraryId}/collection/${collectionId}/`;
   const urlMatch = useMatch(url);
+
+  if (!collectionId) {
+    return null;
+  }
 
   return (
     <Stack>
@@ -45,10 +47,7 @@ const CollectionInfo = ({ library, collectionId }: CollectionInfoProps) => {
           Manage tab placeholder
         </Tab>
         <Tab eventKey="details" title={intl.formatMessage(messages.detailsTabTitle)}>
-          <CollectionDetails
-            library={library}
-            collectionId={collectionId}
-          />
+          <CollectionDetails />
         </Tab>
       </Tabs>
     </Stack>

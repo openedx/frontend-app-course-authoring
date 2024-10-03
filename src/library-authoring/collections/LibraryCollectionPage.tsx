@@ -196,7 +196,7 @@ const LibraryCollectionPage = () => {
       </div>
       { !!sidebarBodyComponent && (
         <div className="library-authoring-sidebar box-shadow-left-1 bg-white" data-testid="library-sidebar">
-          <LibrarySidebar library={libraryData} />
+          <LibrarySidebar />
         </div>
       )}
     </div>

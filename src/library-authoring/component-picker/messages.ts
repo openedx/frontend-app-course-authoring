@@ -26,6 +26,16 @@ const messages = defineMessages({
     defaultMessage: 'There are no libraries with the current filters.',
     description: 'The message for the empty state in the select library component',
   },
+  selectLibraryNextButton: {
+    id: 'course-authoring.library-authoring.pick-components.select-library.next-button',
+    defaultMessage: 'Next',
+    description: 'The text for the next button in the select library component',
+  },
+  pickComponentPreviousButton: {
+    id: 'course-authoring.library-authoring.pick-components.previous-button',
+    defaultMessage: 'Previous',
+    description: 'The text for the previous button in the pick component component',
+  },
 });
 
 export default messages;

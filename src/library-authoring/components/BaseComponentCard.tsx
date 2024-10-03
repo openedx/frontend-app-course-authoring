@@ -9,6 +9,7 @@ import {
 import { getItemIcon, getComponentStyleColor } from '../../generic/block-type-utils';
 import TagCount from '../../generic/tag-count';
 import { ContentHitTags, Highlight } from '../../search-manager';
+import { useLibraryContext } from '../common/context';
 
 type BaseComponentCardProps = {
   type: string,
@@ -38,6 +39,7 @@ const BaseComponentCard = ({
   }, [tags]);
 
   const componentIcon = getItemIcon(type);
+  const { componentPickerMode } = useLibraryContext();
 
   return (
     <Container className="library-component-card">
@@ -55,7 +57,7 @@ const BaseComponentCard = ({
           title={
             <Icon src={componentIcon} className="library-component-header-icon" />
           }
-          actions={actions}
+          actions={!componentPickerMode && actions}
         />
         <Card.Body>
           <Card.Section>

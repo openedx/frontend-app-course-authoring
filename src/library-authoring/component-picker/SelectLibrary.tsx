@@ -3,7 +3,8 @@ import {
   Alert,
   Card,
   Pagination,
-  RadioButton,
+  RadioControl,
+  Form,
   SearchField,
   Stack,
 } from '@openedx/paragon';
@@ -79,7 +80,7 @@ const SelectLibrary = ({ setSelectLibrary }: SelectLibraryProps) => {
               title={<span className="card-item-title">{library.title}</span>}
               subtitle={`${library.org} / ${library.slug}`}
               actions={(
-                <RadioButton
+                <RadioControl
                   name="select-library"
                   value={library.id}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSelectLibrary(e.target.value)}

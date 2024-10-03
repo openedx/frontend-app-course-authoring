@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet';
 import classNames from 'classnames';
 import { StudioFooter } from '@edx/frontend-component-footer';
@@ -33,7 +33,6 @@ import {
 import LibraryComponents from './components/LibraryComponents';
 import LibraryCollections from './collections/LibraryCollections';
 import LibraryHome from './LibraryHome';
-import { useContentLibrary } from './data/apiHooks';
 import { LibrarySidebar } from './library-sidebar';
 import { SidebarBodyComponentId, useLibraryContext } from './common/context';
 import messages from './messages';
@@ -119,27 +118,23 @@ const SubHeaderTitle = ({ title, showReadOnlyBadge }: { title: string, showReadO
   );
 };
 
-interface LibraryAuthoringPageProps {
-  libraryId?: string;
-  componentPicker?: boolean;
-}
-
-const LibraryAuthoringPage = (props: LibraryAuthoringPageProps) => {
+const LibraryAuthoringPage = () => {
   const intl = useIntl();
   const location = useLocation();
   const navigate = useNavigate();
 
   const {
     libraryId,
+    libraryData,
+    isLoadingLibraryData,
     componentPickerMode,
     sidebarBodyComponent,
     openInfoSidebar,
   } = useLibraryContext();
-  const { data: libraryData, isLoading } = useContentLibrary(libraryId);
 
   const currentPath = location.pathname.split('/').pop();
   let initialActiveKey: string | undefined;
-  if (componentPickerMode || currentPath === libraryId) {
+  if (componentPickerMode || currentPath === libraryId || currentPath === '') {
     initialActiveKey = TabList.home;
   } else if (currentPath && currentPath in TabList) {
     initialActiveKey = TabList[currentPath];
@@ -155,7 +150,7 @@ const LibraryAuthoringPage = (props: LibraryAuthoringPageProps) => {
 
   const [searchParams] = useSearchParams();
 
-  if (isLoading) {
+  if (isLoadingLibraryData) {
     return <Loading />;
   }
 
@@ -168,14 +163,13 @@ const LibraryAuthoringPage = (props: LibraryAuthoringPageProps) => {
   }
 
   const handleTabChange = (key: string) => {
-    if (componentPickerMode) {
-      setActiveKey(key);
-      return;
+    setActiveKey(key);
+    if (!componentPickerMode) {
+      navigate({
+        pathname: key,
+        search: searchParams.toString(),
+      });
     }
-    navigate({
-      pathname: key,
-      search: searchParams.toString(),
-    });
   };
 
   return (
@@ -247,7 +241,7 @@ const LibraryAuthoringPage = (props: LibraryAuthoringPageProps) => {
       </div>
       {!!sidebarBodyComponent && (
         <div className="library-authoring-sidebar box-shadow-left-1 bg-white" data-testid="library-sidebar">
-          <LibrarySidebar library={libraryData} />
+          <LibrarySidebar />
         </div>
       )}
     </div>

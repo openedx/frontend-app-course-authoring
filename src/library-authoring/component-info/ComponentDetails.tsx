@@ -3,17 +3,22 @@ import { Stack } from '@openedx/paragon';
 
 import AlertError from '../../generic/alert-error';
 import Loading from '../../generic/Loading';
+import { useLibraryContext } from '../common/context';
 import { useLibraryBlockMetadata } from '../data/apiHooks';
 import HistoryWidget from '../generic/history-widget';
 import { ComponentDeveloperInfo } from './ComponentDeveloperInfo';
 import messages from './messages';
 
-interface ComponentDetailsProps {
-  usageKey: string;
-}
-
-const ComponentDetails = ({ usageKey }: ComponentDetailsProps) => {
+const ComponentDetails = () => {
   const intl = useIntl();
+
+  const { currentComponentUsageKey: usageKey } = useLibraryContext();
+
+  // istanbul ignore if: this should never happen
+  if (!usageKey) {
+    throw new Error('usageKey is required');
+  }
+
   const {
     data: componentMetadata,
     isError,

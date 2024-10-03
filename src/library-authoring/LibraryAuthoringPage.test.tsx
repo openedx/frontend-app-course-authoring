@@ -213,6 +213,7 @@ describe('<LibraryAuthoringPage />', () => {
     await waitFor(() => { expect(fetchMock).toHaveFetchedTimes(1, searchEndpoint, 'post'); });
 
     expect(await screen.findByText('Content library')).toBeInTheDocument();
+    screen.logTestingPlaygroundURL();
     expect(screen.getByText('You have not added any content to this library yet.')).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /add component/i })).not.toBeInTheDocument();
     expect(screen.getByText('Read Only')).toBeInTheDocument();
@@ -505,7 +506,7 @@ describe('<LibraryAuthoringPage />', () => {
     expect(showProbTypesSubmenuBtn).not.toBeNull();
     fireEvent.click(showProbTypesSubmenuBtn!);
 
-    const validateSubmenu = async (submenuText : string) => {
+    const validateSubmenu = async (submenuText: string) => {
       const submenu = screen.getByText(submenuText);
       expect(submenu).toBeInTheDocument();
       fireEvent.click(submenu);
