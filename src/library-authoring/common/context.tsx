@@ -150,6 +150,7 @@ export const LibraryProvider = ({
 export function useLibraryContext(): LibraryContextData {
   const ctx = React.useContext(LibraryContext);
   if (ctx === undefined) {
+    /* istanbul ignore next */
     throw new Error('useLibraryContext() was used in a component without a <LibraryProvider> ancestor.');
   }
   return ctx;
