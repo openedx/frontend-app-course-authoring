@@ -43,6 +43,22 @@ enum TabList {
   collections = 'collections',
 }
 
+interface TabContentProps {
+  eventKey: string;
+  handleTabChange: (key: string) => void;
+}
+
+const TabContent = ({ eventKey, handleTabChange }: TabContentProps) => {
+  switch (eventKey) {
+    case TabList.components:
+      return <LibraryComponents variant="full" />;
+    case TabList.collections:
+      return <LibraryCollections variant="full" />;
+    default:
+      return <LibraryHome tabList={TabList} handleTabChange={handleTabChange} />;
+  }
+};
+
 interface HeaderActionsProps {
   canEditLibrary: boolean;
 }
@@ -218,23 +234,11 @@ const LibraryAuthoringPage = () => {
               onSelect={handleTabChange}
               className="my-3"
             >
-              <Tab eventKey={TabList.home} title={intl.formatMessage(messages.homeTab)}>
-                <LibraryHome
-                  tabList={TabList}
-                  handleTabChange={handleTabChange}
-                />
-              </Tab>
-              <Tab eventKey={TabList.components} title={intl.formatMessage(messages.componentsTab)}>
-                <LibraryComponents
-                  variant="full"
-                />
-              </Tab>
-              <Tab eventKey={TabList.collections} title={intl.formatMessage(messages.collectionsTab)}>
-                <LibraryCollections
-                  variant="full"
-                />
-              </Tab>
+              <Tab eventKey={TabList.home} title={intl.formatMessage(messages.homeTab)} />
+              <Tab eventKey={TabList.components} title={intl.formatMessage(messages.componentsTab)} />
+              <Tab eventKey={TabList.collections} title={intl.formatMessage(messages.collectionsTab)} />
             </Tabs>
+            <TabContent eventKey={activeKey} handleTabChange={handleTabChange} />
           </SearchContextProvider>
         </Container>
         {!componentPickerMode && <StudioFooter containerProps={{ size: undefined }} />}
