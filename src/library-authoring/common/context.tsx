@@ -94,9 +94,9 @@ export const LibraryProvider = ({
     },
     [],
   );
-  const openCollectionInfoSidebar = React.useCallback((collectionId: string) => {
+  const openCollectionInfoSidebar = React.useCallback((newCollectionId: string) => {
     resetSidebar();
-    setcurrentCollectionId(collectionId);
+    setcurrentCollectionId(newCollectionId);
     setSidebarBodyComponent(SidebarBodyComponentId.CollectionInfo);
   }, []);
 

@@ -4,7 +4,6 @@ import {
   Card,
   Pagination,
   RadioControl,
-  Form,
   SearchField,
   Stack,
 } from '@openedx/paragon';

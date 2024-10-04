@@ -18,7 +18,7 @@ mockContentLibrary.applyMock();
 mockLibraryBlockMetadata.applyMock();
 mockContentTaxonomyTagsData.applyMock();
 
-const { libraryId: mockLibraryId, libraryIdReadOnly } = mockContentLibrary;
+const { libraryId: mockLibraryId } = mockContentLibrary;
 
 /*
  * This function is used to get the inner text of an element.
