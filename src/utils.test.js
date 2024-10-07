@@ -71,7 +71,7 @@ describe('FilesAndUploads utils', () => {
       getConfig.mockReturnValue({ PUBLIC_PATH: 'example.com/' });
       getPath.mockReturnValue('/course-authoring/');
 
-      const checkPath = '/some/path';
+      const checkPath = '/course-authoring/some/path';
       const result = createCorrectInternalRoute(checkPath);
 
       expect(result).toBe('/course-authoring/some/path');

@@ -20,25 +20,25 @@ const PageSettingButton = ({
   const { formatMessage } = useIntl();
   const { path: pagesAndResourcesPath } = useContext(PagesAndResourcesContext);
   const navigate = useNavigate();
-  const { waffleFlags } = useSelector(getStudioHomeData);
+  const studioHomeData = useSelector(getStudioHomeData);
 
   const linkTo = useMemo(() => {
     if (!legacyLink) { return null; }
 
     if (legacyLink.includes('textbooks')) {
-      return waffleFlags?.ENABLE_NEW_TEXTBOOKS_PAGE
+      return studioHomeData?.waffleFlags?.ENABLE_NEW_TEXTBOOKS_PAGE
         ? `/course/${courseId}/${id.replace('_', '-')}`
         : legacyLink;
     }
 
     if (legacyLink.includes('tabs')) {
-      return waffleFlags?.ENABLE_NEW_CUSTOM_PAGES
+      return studioHomeData?.waffleFlags?.ENABLE_NEW_CUSTOM_PAGES
         ? `/course/${courseId}/${id.replace('_', '-')}`
         : legacyLink;
     }
 
     return null;
-  }, [legacyLink, waffleFlags, id]);
+  }, [legacyLink, studioHomeData?.waffleFlags, id]);
 
   const canConfigureOrEnable = allowedOperations?.configure || allowedOperations?.enable;
 

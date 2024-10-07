@@ -27,6 +27,7 @@ describe('PagesAndResources', () => {
 
     expect(screen.queryByRole('heading', { name: 'Content permissions' })).not.toBeInTheDocument();
   });
+
   it('show content permissions section if Learning Assistant app is enabled', async () => {
     const initialState = {
       models: {

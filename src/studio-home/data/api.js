@@ -2,6 +2,8 @@
 import { camelCaseObject, snakeCaseObject, getConfig } from '@edx/frontend-platform';
 import { getAuthenticatedHttpClient } from '@edx/frontend-platform/auth';
 
+import { getWaffleFlagsConfig } from './utils';
+
 export const getApiBaseUrl = () => getConfig().STUDIO_BASE_URL;
 export const getStudioHomeApiUrl = () => new URL('api/contentstore/v1/home', getApiBaseUrl()).href;
 export const getRequestCourseCreatorUrl = () => new URL('request_course_creator', getApiBaseUrl()).href;
@@ -14,29 +16,10 @@ export const getCourseNotificationUrl = (url) => new URL(url, getApiBaseUrl()).h
 export async function getStudioHomeData() {
   const { data } = await getAuthenticatedHttpClient().get(getStudioHomeApiUrl());
 
-  const result = camelCaseObject(data);
-
-  const waffleFlagsConfig = {
-    ENABLE_NEW_SCHEDULE_AND_DETAILS_PAGE: result?.waffleFlags?.contentstoreNewStudioMfeUseNewScheduleDetailsPage,
-    ENABLE_NEW_GRADING_PAGE: result?.waffleFlags?.contentstoreNewStudioMfeUseNewGradingPage,
-    ENABLE_NEW_COURSE_TEAM_PAGE: result?.waffleFlags?.contentstoreNewStudioMfeUseNewCourseTeamPage,
-    ENABLE_NEW_GROUP_CONFIGURATIONS_PAGE: result?.waffleFlags?.contentstoreNewStudioMfeUseNewGroupConfigurationsPage,
-    ENABLE_NEW_ADVANCED_SETTINGS_PAGE: result?.waffleFlags?.contentstoreNewStudioMfeUseNewAdvancedSettingsPage,
-    ENABLE_NEW_COURSE_OUTLINE_PAGE: result?.waffleFlags?.contentstoreNewStudioMfeUseNewCourseOutlinePage,
-    ENABLE_NEW_COURSE_UPDATES_PAGE: result?.waffleFlags?.contentstoreNewStudioMfeUseNewUpdatesPage,
-    ENABLE_NEW_FILE_UPLOAD_PAGE: result?.waffleFlags?.contentstoreNewStudioMfeUseNewFilesUploadsPage,
-    ENABLE_NEW_PAGES_AND_RESOURCES_PAGE: result?.waffleFlags?.contentstoreNewStudioMfeUseNewCustomPages,
-    ENABLE_NEW_IMPORT_PAGE: result?.waffleFlags?.contentstoreNewStudioMfeUseNewImportPage,
-    ENABLE_NEW_EXPORT_PAGE: result?.waffleFlags?.contentstoreNewStudioMfeUseNewExportPage,
-    ENABLE_NEW_HOME_PAGE: result?.waffleFlags?.newStudioMfeUseNewHomePage,
-    ENABLE_NEW_TEXTBOOKS_PAGE: result?.waffleFlags?.contentstoreNewStudioMfeUseNewTextbooksPage,
-    ENABLE_NEW_CUSTOM_PAGES: result?.waffleFlags?.contentstoreNewStudioMfeUseNewCustomPages,
-    ENABLE_NEW_VIDEO_UPLOAD_PAGE: result?.waffleFlags?.contentstoreNewStudioMfeUseNewVideoUploadsPage,
-    ENABLE_NEW_CERTIFICATES_PAGE: result?.waffleFlags?.contentstoreNewStudioMfeUseNewCertificatesPage,
-    ENABLE_NEW_UNIT_PAGE: result?.waffleFlags?.contentstoreNewStudioMfeUseNewUnitPage,
+  const result = {
+    ...camelCaseObject(data),
+    waffleFlags: getWaffleFlagsConfig(camelCaseObject(data)),
   };
-
-  result.waffleFlags = waffleFlagsConfig;
 
   return result;
 }
