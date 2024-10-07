@@ -1,9 +1,10 @@
-import React from 'react';
 import PropTypes from 'prop-types';
+import { useSelector } from 'react-redux';
 import { useLocation } from 'react-router-dom';
 import classNames from 'classnames';
 import { injectIntl, intlShape } from '@edx/frontend-platform/i18n';
 import { getConfig } from '@edx/frontend-platform';
+import { getStudioHomeData } from '../../studio-home/data/selectors';
 
 import { otherLinkURLParams } from './constants';
 import messages from './messages';
@@ -25,6 +26,7 @@ const HelpSidebar = ({
     scheduleAndDetails,
     groupConfigurations,
   } = otherLinkURLParams;
+  const { waffleFlags } = useSelector(getStudioHomeData);
 
   const showOtherLink = (params) => !pathname.includes(params);
   const generateLegacyURL = (urlParameter) => {
@@ -55,36 +57,46 @@ const HelpSidebar = ({
               <ul className="p-0 mb-0">
                 {showOtherLink(scheduleAndDetails) && (
                   <HelpSidebarLink
-                    pathToPage={scheduleAndDetailsDestination}
+                    pathToPage={waffleFlags?.ENABLE_NEW_SCHEDULE_AND_DETAILS_PAGE
+                      ? `/course/${courseId}/${scheduleAndDetails}` : scheduleAndDetailsDestination}
                     title={intl.formatMessage(
                       messages.sidebarLinkToScheduleAndDetails,
                     )}
+                    isNewPage={waffleFlags?.ENABLE_NEW_SCHEDULE_AND_DETAILS_PAGE}
                   />
                 )}
                 {showOtherLink(grading) && (
                   <HelpSidebarLink
-                    pathToPage={gradingDestination}
+                    pathToPage={waffleFlags?.ENABLE_NEW_GRADING_PAGE
+                      ? `/course/${courseId}/${grading}` : gradingDestination}
                     title={intl.formatMessage(messages.sidebarLinkToGrading)}
+                    isNewPage={waffleFlags?.ENABLE_NEW_GRADING_PAGE}
                   />
                 )}
                 {showOtherLink(courseTeam) && (
                   <HelpSidebarLink
-                    pathToPage={courseTeamDestination}
+                    pathToPage={waffleFlags?.ENABLE_NEW_COURSE_TEAM_PAGE
+                      ? `/course/${courseId}/${courseTeam}` : courseTeamDestination}
                     title={intl.formatMessage(messages.sidebarLinkToCourseTeam)}
+                    isNewPage={waffleFlags?.ENABLE_NEW_COURSE_TEAM_PAGE}
                   />
                 )}
                 {showOtherLink(groupConfigurations) && (
                   <HelpSidebarLink
-                    pathToPage={groupConfigurationsDestination}
+                    pathToPage={waffleFlags?.ENABLE_NEW_GROUP_CONFIGURATIONS_PAGE
+                      ? `/course/${courseId}/${groupConfigurations}` : groupConfigurationsDestination}
                     title={intl.formatMessage(
                       messages.sidebarLinkToGroupConfigurations,
                     )}
+                    isNewPage={waffleFlags?.ENABLE_NEW_GROUP_CONFIGURATIONS_PAGE}
                   />
                 )}
                 {showOtherLink(advancedSettings) && (
                   <HelpSidebarLink
-                    pathToPage={advancedSettingsDestination}
+                    pathToPage={waffleFlags?.ENABLE_NEW_ADVANCED_SETTINGS_PAGE
+                      ? `/course/${courseId}/${advancedSettings}` : advancedSettingsDestination}
                     title={intl.formatMessage(messages.sidebarLinkToAdvancedSettings)}
+                    isNewPage={waffleFlags?.ENABLE_NEW_ADVANCED_SETTINGS_PAGE}
                   />
                 )}
                 {proctoredExamSettingsUrl && (

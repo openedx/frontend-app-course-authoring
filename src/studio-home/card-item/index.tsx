@@ -59,8 +59,11 @@ const CardItem: React.FC<Props> = ({
     allowCourseReruns,
     courseCreatorStatus,
     rerunCreatorStatus,
+    waffleFlags,
   } = useSelector(getStudioHomeData);
-  const destinationUrl: string = path ?? new URL(url, getConfig().STUDIO_BASE_URL).toString();
+  const destinationUrl: string = waffleFlags?.ENABLE_NEW_COURSE_OUTLINE_PAGE
+    ? path ?? url
+    : path ?? new URL(url, getConfig().STUDIO_BASE_URL).toString();
   const subtitle = isLibraries ? `${org} / ${number}` : `${org} / ${number} / ${run}`;
   const readOnlyItem = !(lmsLink || rerunLink || url || path);
   const showActions = !(readOnlyItem || isLibraries);
@@ -95,7 +98,10 @@ const CardItem: React.FC<Props> = ({
               />
               <Dropdown.Menu>
                 {isShowRerunLink && (
-                  <Dropdown.Item href={trimSlashes(rerunLink ?? '')}>
+                  <Dropdown.Item
+                    as={Link}
+                    to={rerunLink ?? ''}
+                  >
                     {messages.btnReRunText.defaultMessage}
                   </Dropdown.Item>
                 )}

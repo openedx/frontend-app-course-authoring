@@ -8,6 +8,7 @@ import { copyToClipboard } from '../generic/data/thunks';
 import { getSavingStatus as getGenericSavingStatus } from '../generic/data/selectors';
 import { RequestStatus } from '../data/constants';
 import { COURSE_BLOCK_NAMES } from './constants';
+import { getStudioHomeData } from '../studio-home/data/selectors';
 import {
   setCurrentItem,
   setCurrentSection,
@@ -58,6 +59,7 @@ import {
 const useCourseOutline = ({ courseId }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const { waffleFlags } = useSelector(getStudioHomeData);
 
   const {
     reindexLink,
@@ -112,7 +114,7 @@ const useCourseOutline = ({ courseId }) => {
   };
 
   const getUnitUrl = (locator) => {
-    if (getConfig().ENABLE_UNIT_PAGE === 'true') {
+    if (getConfig().ENABLE_UNIT_PAGE === 'true' || waffleFlags?.ENABLE_NEW_UNIT_PAGE) {
       return `/course/${courseId}/container/${locator}`;
     }
     return `${getConfig().STUDIO_BASE_URL}/container/${locator}`;
@@ -120,7 +122,7 @@ const useCourseOutline = ({ courseId }) => {
 
   const openUnitPage = (locator) => {
     const url = getUnitUrl(locator);
-    if (getConfig().ENABLE_UNIT_PAGE === 'true') {
+    if (getConfig().ENABLE_UNIT_PAGE === 'true' || waffleFlags?.ENABLE_NEW_UNIT_PAGE) {
       navigate(url);
     } else {
       window.location.assign(url);
