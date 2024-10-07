@@ -22,7 +22,7 @@ const PageSettingButton = ({
   const navigate = useNavigate();
   const studioHomeData = useSelector(getStudioHomeData);
 
-  const linkTo = useMemo(() => {
+  const determineLinkDestination = useMemo(() => {
     if (!legacyLink) { return null; }
 
     if (legacyLink.includes('textbooks')) {
@@ -42,9 +42,9 @@ const PageSettingButton = ({
 
   const canConfigureOrEnable = allowedOperations?.configure || allowedOperations?.enable;
 
-  if (linkTo) {
+  if (determineLinkDestination) {
     return (
-      <Link to={linkTo}>
+      <Link to={determineLinkDestination}>
         <IconButton
           src={ArrowForward}
           iconAs={Icon}

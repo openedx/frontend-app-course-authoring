@@ -21,13 +21,13 @@ const ChecklistItemBody = ({
   // injected
   intl,
 }) => {
-  const { waffleFlags } = useSelector(getStudioHomeData);
+  const studioHomeData = useSelector(getStudioHomeData);
   const navigate = useNavigate();
 
   const handleClick = (e, url) => {
     e.preventDefault();
 
-    if (waffleFlags?.ENABLE_NEW_COURSE_UPDATES_PAGE) {
+    if (studioHomeData?.waffleFlags?.ENABLE_NEW_COURSE_UPDATES_PAGE) {
       navigate(`/course/${courseId}/course_info`);
     } else {
       window.location.href = url;

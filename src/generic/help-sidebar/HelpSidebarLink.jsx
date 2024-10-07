@@ -9,9 +9,7 @@ const HelpSidebarLink = ({
   if (isNewPage) {
     return (
       <TagElement className="sidebar-link">
-        <Link
-          to={pathToPage}
-        >
+        <Link to={pathToPage}>
           {title}
         </Link>
       </TagElement>

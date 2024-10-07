@@ -4,8 +4,8 @@ import { useLocation } from 'react-router-dom';
 import classNames from 'classnames';
 import { injectIntl, intlShape } from '@edx/frontend-platform/i18n';
 import { getConfig } from '@edx/frontend-platform';
-import { getStudioHomeData } from '../../studio-home/data/selectors';
 
+import { getStudioHomeData } from '../../studio-home/data/selectors';
 import { otherLinkURLParams } from './constants';
 import messages from './messages';
 import HelpSidebarLink from './HelpSidebarLink';

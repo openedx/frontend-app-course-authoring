@@ -4,8 +4,8 @@ import { useIntl } from '@edx/frontend-platform/i18n';
 import { StudioHeader } from '@edx/frontend-component-header';
 import { type Container, useToggle } from '@openedx/paragon';
 import { generatePath, useHref, useNavigate } from 'react-router-dom';
-import { getStudioHomeData } from '../studio-home/data/selectors';
 
+import { getStudioHomeData } from '../studio-home/data/selectors';
 import { SearchModal } from '../search-modal';
 import { useContentMenuItems, useSettingMenuItems, useToolsMenuItems } from './hooks';
 import messages from './messages';

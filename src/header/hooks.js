@@ -10,8 +10,6 @@ export const useContentMenuItems = courseId => {
   const studioBaseUrl = getConfig().STUDIO_BASE_URL;
   const { waffleFlags } = useSelector(getStudioHomeData);
 
-  // console.log('================= waffleFlags', waffleFlags);
-
   const items = [
     {
       href: waffleFlags?.ENABLE_NEW_COURSE_OUTLINE_PAGE ? `/course/${courseId}` : `${studioBaseUrl}/course/${courseId}`,
