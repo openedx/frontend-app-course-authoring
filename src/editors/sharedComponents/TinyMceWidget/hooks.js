@@ -100,19 +100,27 @@ export const replaceStaticWithAsset = ({
       const isCorrectAssetFormat = assetSrc.startsWith('/asset') && assetSrc.match(/\/asset-v1:\S+[+]\S+[@]\S+[+]\S+[@]/g)?.length >= 1;
       // assets in expandable text areas so not support relative urls so all assets must have the lms
       // endpoint prepended to the relative url
-      if (editorType === 'expandable') {
-        if (isCorrectAssetFormat) {
-          staticFullUrl = `${lmsEndpointUrl}${assetSrc}`;
-        } else {
-          staticFullUrl = `${lmsEndpointUrl}${getRelativeUrl({ courseId: learningContextId, displayName })}`;
-        }
-      } else if (!isCorrectAssetFormat) {
-        staticFullUrl = getRelativeUrl({ courseId: learningContextId, displayName });
+      if (learningContextId.startsWith('lib:')) {
+        // We're basically disabling this whole substitution path when the Learning Context is a Library,
+        // because the code currently just doesn't handle it correctly. Libraries don't mangle the path
+        // into an asset key–it might be sufficient to remove the initial "/" in a "/static/images/foo.png"
+        // link, and then set the base URL to the correct ComponentVersion base.
       }
-      if (staticFullUrl) {
-        const currentSrc = src.substring(0, src.indexOf('"'));
-        content = currentContent.replace(currentSrc, staticFullUrl);
-        hasChanges = true;
+      else {
+        if (editorType === 'expandable') {
+          if (isCorrectAssetFormat) {
+            staticFullUrl = `${lmsEndpointUrl}${assetSrc}`;
+          } else {
+            staticFullUrl = `${lmsEndpointUrl}${getRelativeUrl({ courseId: learningContextId, displayName })}`;
+          }
+        } else if (!isCorrectAssetFormat) {
+          staticFullUrl = getRelativeUrl({ courseId: learningContextId, displayName });
+        }
+        if (staticFullUrl) {
+          const currentSrc = src.substring(0, src.indexOf('"'));
+          content = currentContent.replace(currentSrc, staticFullUrl);
+          hasChanges = true;
+        }
       }
     });
     if (hasChanges) { return content; }

@@ -133,8 +133,8 @@ const FilesPage = ({
   const tableColumns = [
     { ...thumbnailColumn },
     {
-      Header: 'File name',
-      accessor: 'displayName',
+      Header: 'File path',
+      accessor: 'expandedPath',
     },
     { ...fileSizeColumn },
     {

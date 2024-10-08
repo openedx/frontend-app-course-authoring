@@ -35,9 +35,7 @@ const DeleteConfirmationModal = ({
         styling="basic"
         title={(
           <h3 className="h5 m-n2">
-            <Truncate lines={1}>
-              {original.displayName}
-            </Truncate>
+            {original.expandedPath}
           </h3>
         )}
         data-testid={`collapsible-${original.id}`}
@@ -61,7 +59,7 @@ const DeleteConfirmationModal = ({
       title={intl.formatMessage(
         messages.deleteConfirmationTitle,
         {
-          fileName: firstSelectedRow?.displayName,
+          fileName: firstSelectedRow?.expandedPath,
           fileNumber: selectedRows.length,
           fileType,
         },
@@ -82,7 +80,7 @@ const DeleteConfirmationModal = ({
       {intl.formatMessage(
         messages.deleteConfirmationMessage,
         {
-          fileName: firstSelectedRow?.displayName,
+          fileName: firstSelectedRow?.expandedPath,
           fileNumber: selectedRows.length,
           fileType,
         },

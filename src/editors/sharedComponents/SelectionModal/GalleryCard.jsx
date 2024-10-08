@@ -65,8 +65,12 @@ const GalleryCard = ({
           )}
         </div>
         <div className="card-text px-3 py-2" style={{ marginTop: '10px' }}>
-          <h3 className="text-primary-500">
-            <Truncate>{asset.displayName}</Truncate>
+          <h3 className="text-primary-500" style={{ wordBreak: "break-word"}}>
+          {/* We use "break-word" above and avoid <Truncate> because sometimes
+              we're displaying an entire path and not just the file name, and we
+              don't want to cut out the last part of the path that has the
+              actual file name). */}
+            {asset.expandedPath}
           </h3>
           { asset.transcripts && (
             <div style={{ margin: '0 0 5px 0' }}>
@@ -97,6 +101,7 @@ GalleryCard.propTypes = {
   asset: PropTypes.shape({
     contentType: PropTypes.string,
     displayName: PropTypes.string,
+    expandedPath: PropTypes.string,
     externalUrl: PropTypes.string,
     id: PropTypes.string,
     dateAdded: PropTypes.oneOfType([PropTypes.number, PropTypes.instanceOf(Date)]),
