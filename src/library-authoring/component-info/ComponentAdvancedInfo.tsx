@@ -14,7 +14,6 @@ import { LoadingSpinner } from '../../generic/Loading';
 import { CodeEditor, EditorAccessor } from '../../generic/CodeEditor';
 import { useLibraryContext } from '../common/context';
 import {
-  useContentLibrary,
   useUpdateXBlockOLX,
   useXBlockAssets,
   useXBlockOLX,
@@ -27,9 +26,7 @@ interface Props {
 
 export const ComponentAdvancedInfo: React.FC<Props> = ({ usageKey }) => {
   const intl = useIntl();
-  const { libraryId } = useLibraryContext();
-  const { data: library } = useContentLibrary(libraryId);
-  const canEditLibrary = library?.canEditLibrary ?? false;
+  const { readOnly } = useLibraryContext();
   const { data: olx, isLoading: isOLXLoading } = useXBlockOLX(usageKey);
   const { data: assets, isLoading: areAssetsLoading } = useXBlockAssets(usageKey);
   const editorRef = React.useRef<EditorAccessor | undefined>(undefined);
@@ -83,7 +80,7 @@ export const ComponentAdvancedInfo: React.FC<Props> = ({ usageKey }) => {
                       <FormattedMessage {...messages.advancedDetailsOLXCancelButton} />
                     </Button>
                   </>
-                ) : canEditLibrary ? (
+                ) : !readOnly ? (
                   <OverlayTrigger
                     placement="bottom-start"
                     overlay={(

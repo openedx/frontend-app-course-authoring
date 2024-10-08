@@ -38,7 +38,7 @@ const BaseComponentCard = ({
             + (tags.level2?.length || 0) + (tags.level3?.length || 0);
   }, [tags]);
 
-  const componentIcon = getItemIcon(type);
+  const componentIcon = getItemIcon(componentType);
   const { componentPickerMode } = useLibraryContext();
 
   return (

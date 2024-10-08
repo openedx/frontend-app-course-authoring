@@ -7,15 +7,12 @@ import {
 } from '@openedx/paragon';
 
 import { useLibraryContext } from '../common/context';
-import { getEditUrl } from '../components/utils';
 import { ComponentMenu } from '../components';
+import { canEditComponent } from '../components/ComponentEditorModal';
 import ComponentDetails from './ComponentDetails';
 import ComponentManagement from './ComponentManagement';
 import ComponentPreview from './ComponentPreview';
 import messages from './messages';
-import { canEditComponent } from '../components/ComponentEditorModal';
-import { useLibraryContext } from '../common/context';
-import { useContentLibrary } from '../data/apiHooks';
 
 const ComponentInfo = () => {
   const intl = useIntl();
@@ -30,7 +27,6 @@ const ComponentInfo = () => {
     return null;
   }
 
-  const editUrl = getEditUrl(usageKey);
   const canEdit = canEditComponent(usageKey);
 
   return (
@@ -38,7 +34,7 @@ const ComponentInfo = () => {
       {!readOnly && (
         <div className="d-flex flex-wrap">
           <Button
-             {...(canEdit ? { onClick: () => openComponentEditor(usageKey) } : { disabled: true })}
+            {...(canEdit ? { onClick: () => openComponentEditor(usageKey) } : { disabled: true })}
             variant="outline-primary"
             className="m-1 text-nowrap flex-grow-1"
           >

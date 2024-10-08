@@ -59,11 +59,7 @@ const TabContent = ({ eventKey, handleTabChange }: TabContentProps) => {
   }
 };
 
-interface HeaderActionsProps {
-  canEditLibrary: boolean;
-}
-
-const HeaderActions = ({ canEditLibrary }: HeaderActionsProps) => {
+const HeaderActions = () => {
   const intl = useIntl();
   const {
     componentPickerMode,
@@ -71,9 +67,10 @@ const HeaderActions = ({ canEditLibrary }: HeaderActionsProps) => {
     openInfoSidebar,
     closeLibrarySidebar,
     sidebarBodyComponent,
+    readOnly,
   } = useLibraryContext();
 
-  if (!canEditLibrary) {
+  if (!readOnly) {
     return null;
   }
 
@@ -217,7 +214,7 @@ const LibraryAuthoringPage = () => {
               )}
               subtitle={intl.formatMessage(messages.headingSubtitle)}
               headerActions={(
-                <HeaderActions canEditLibrary={libraryData.canEditLibrary} />
+                <HeaderActions />
               )}
             />
             <SearchKeywordsField className="w-50" />

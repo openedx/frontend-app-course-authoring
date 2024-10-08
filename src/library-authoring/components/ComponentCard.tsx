@@ -2,9 +2,10 @@ import React, { useContext, useState } from 'react';
 import { FormattedMessage, useIntl } from '@edx/frontend-platform/i18n';
 import {
   ActionRow,
+  Button,
+  Dropdown,
   Icon,
   IconButton,
-  Dropdown,
 } from '@openedx/paragon';
 import { MoreVert } from '@openedx/paragon/icons';
 
@@ -24,6 +25,7 @@ type ComponentCardProps = {
 export const ComponentMenu = ({ usageKey }: { usageKey: string }) => {
   const intl = useIntl();
   const { openComponentEditor } = useLibraryContext();
+
   const canEdit = usageKey && canEditComponent(usageKey);
   const { showToast } = useContext(ToastContext);
   const [clipboardBroadcastChannel] = useState(() => new BroadcastChannel(STUDIO_CLIPBOARD_CHANNEL));
@@ -65,6 +67,7 @@ export const ComponentMenu = ({ usageKey }: { usageKey: string }) => {
 const ComponentCard = ({ contentHit } : ComponentCardProps) => {
   const {
     openComponentInfoSidebar,
+    componentPickerMode,
   } = useLibraryContext();
 
   const {
@@ -88,6 +91,14 @@ const ComponentCard = ({ contentHit } : ComponentCardProps) => {
       tags={tags}
       actions={(
         <ActionRow>
+          {componentPickerMode && (
+            <Button
+              variant="primary"
+              onClick={() => alert('Hi')}
+            >
+              Hi!
+            </Button>
+          )}
           <ComponentMenu usageKey={usageKey} />
         </ActionRow>
       )}

@@ -33,14 +33,14 @@ const ComponentPreview = () => {
   const intl = useIntl();
 
   const [isModalOpen, openModal, closeModal] = useToggle();
-  const { data: componentMetadata } = useLibraryBlockMetadata(usageKey);
-
   const { currentComponentUsageKey: usageKey } = useLibraryContext();
 
   // istanbul ignore if: this should never happen
   if (!usageKey) {
     throw new Error('usageKey is required');
   }
+
+  const { data: componentMetadata } = useLibraryBlockMetadata(usageKey);
 
   return (
     <>
