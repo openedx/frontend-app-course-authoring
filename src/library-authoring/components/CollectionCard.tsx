@@ -66,7 +66,7 @@ const CollectionMenu = ({ collectionHit } : CollectionMenuProps) => {
 
   return (
     <>
-      <Dropdown id="collection-card-dropdown" onClick={(e) => e.stopPropagation()}>
+      <Dropdown id="collection-card-dropdown">
         <Dropdown.Toggle
           id="collection-card-menu-toggle"
           as={IconButton}
@@ -110,6 +110,7 @@ type CollectionCardProps = {
 const CollectionCard = ({ collectionHit } : CollectionCardProps) => {
   const {
     openCollectionInfoSidebar,
+    componentPickerMode,
   } = useLibraryContext();
 
   const {
@@ -127,7 +128,7 @@ const CollectionCard = ({ collectionHit } : CollectionCardProps) => {
       description={description}
       tags={tags}
       numChildren={numChildren}
-      actions={(
+      actions={!componentPickerMode && (
         <ActionRow>
           <CollectionMenu collectionHit={collectionHit} />
         </ActionRow>

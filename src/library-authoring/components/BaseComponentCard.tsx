@@ -9,12 +9,10 @@ import {
 import { getItemIcon, getComponentStyleColor } from '../../generic/block-type-utils';
 import TagCount from '../../generic/tag-count';
 import { BlockTypeLabel, type ContentHitTags, Highlight } from '../../search-manager';
-import { useLibraryContext } from '../common/context';
 
 type BaseComponentCardProps = {
   componentType: string,
-  displayName: string,
-  description: string,
+  displayName: string, description: string,
   numChildren?: number,
   tags: ContentHitTags,
   actions: React.ReactNode,
@@ -39,7 +37,6 @@ const BaseComponentCard = ({
   }, [tags]);
 
   const componentIcon = getItemIcon(componentType);
-  const { componentPickerMode } = useLibraryContext();
 
   return (
     <Container className="library-component-card">
@@ -57,7 +54,12 @@ const BaseComponentCard = ({
           title={
             <Icon src={componentIcon} className="library-component-header-icon" />
           }
-          actions={!componentPickerMode && actions}
+          actions={
+            // Wrap the actions in a div to prevent the card from being clicked when the actions are clicked
+            /* eslint-disable-next-line jsx-a11y/click-events-have-key-events,
+            jsx-a11y/no-static-element-interactions */
+            <div onClick={(e) => e.stopPropagation()}>{actions}</div>
+          }
         />
         <Card.Body>
           <Card.Section>

@@ -5,10 +5,13 @@ import {
   Tabs,
   Stack,
 } from '@openedx/paragon';
+import { useContext } from 'react';
 
+import { ToastContext } from '../../generic/toast-context';
 import { useLibraryContext } from '../common/context';
 import { ComponentMenu } from '../components';
 import { canEditComponent } from '../components/ComponentEditorModal';
+import { useAddComponentToCourse } from '../data/apiHooks';
 import ComponentDetails from './ComponentDetails';
 import ComponentManagement from './ComponentManagement';
 import ComponentPreview from './ComponentPreview';
@@ -16,18 +19,39 @@ import messages from './messages';
 
 const ComponentInfo = () => {
   const intl = useIntl();
+  const { showToast } = useContext(ToastContext);
 
   const {
     currentComponentUsageKey: usageKey,
     readOnly,
     openComponentEditor,
+    componentPickerMode,
   } = useLibraryContext();
+
+  const {
+    mutate: addComponentToCourse,
+    isSuccess: addComponentToCourseSuccess,
+    isError: addComponentToCourseError,
+  } = useAddComponentToCourse();
+
+  if (addComponentToCourseSuccess) {
+    console.log('Component added to course');
+    // FIXME: Add function to message parent that component was added to course
+  }
+
+  if (addComponentToCourseError) {
+    showToast(intl.formatMessage(messages.addComponentToCourseError));
+  }
 
   if (!usageKey) {
     return null;
   }
 
   const canEdit = canEditComponent(usageKey);
+
+  const handleAddComponentToCourse = () => {
+    addComponentToCourse();
+  };
 
   return (
     <Stack>
@@ -45,6 +69,11 @@ const ComponentInfo = () => {
           </Button>
           <ComponentMenu usageKey={usageKey} />
         </div>
+      )}
+      {componentPickerMode && (
+        <Button variant="outline-primary" className="m-1 text-nowrap flex-grow-1" onClick={handleAddComponentToCourse}>
+          {intl.formatMessage(messages.addComponentToCourse)}
+        </Button>
       )}
       <Tabs
         variant="tabs"
