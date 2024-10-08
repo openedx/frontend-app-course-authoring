@@ -5,7 +5,6 @@ import {
   Tabs,
   Stack,
 } from '@openedx/paragon';
-import { Link } from 'react-router-dom';
 
 import { useLibraryContext } from '../common/context';
 import { getEditUrl } from '../components/utils';
@@ -14,24 +13,32 @@ import ComponentDetails from './ComponentDetails';
 import ComponentManagement from './ComponentManagement';
 import ComponentPreview from './ComponentPreview';
 import messages from './messages';
+import { canEditComponent } from '../components/ComponentEditorModal';
+import { useLibraryContext } from '../common/context';
+import { useContentLibrary } from '../data/apiHooks';
 
 const ComponentInfo = () => {
   const intl = useIntl();
 
-  const { currentComponentUsageKey: usageKey, readOnly } = useLibraryContext();
+  const {
+    currentComponentUsageKey: usageKey,
+    readOnly,
+    openComponentEditor,
+  } = useLibraryContext();
 
   if (!usageKey) {
     return null;
   }
 
   const editUrl = getEditUrl(usageKey);
+  const canEdit = canEditComponent(usageKey);
 
   return (
     <Stack>
       {!readOnly && (
         <div className="d-flex flex-wrap">
           <Button
-            {...(editUrl ? { as: Link, to: editUrl } : { disabled: true, to: '#' })}
+             {...(canEdit ? { onClick: () => openComponentEditor(usageKey) } : { disabled: true })}
             variant="outline-primary"
             className="m-1 text-nowrap flex-grow-1"
           >

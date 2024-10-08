@@ -11,16 +11,6 @@ const messages = defineMessages({
     defaultMessage: 'Collection actions menu',
     description: 'Alt/title text for the collection card menu button.',
   },
-  collectionType: {
-    id: 'course-authoring.library-authoring.collection.type',
-    defaultMessage: 'Collection',
-    description: 'Collection type text',
-  },
-  collectionTypeWithCount: {
-    id: 'course-authoring.library-authoring.collection.type-with-count',
-    defaultMessage: 'Collection ({numChildren})',
-    description: 'Collection type text with children count',
-  },
   menuOpen: {
     id: 'course-authoring.library-authoring.collection.menu.open',
     defaultMessage: 'Open',
@@ -50,6 +40,41 @@ const messages = defineMessages({
     id: 'course-authoring.library-authoring.component.copyToClipboardError',
     defaultMessage: 'Failed to copy component to clipboard',
     description: 'Message for failed to copy component to clipboard.',
+  },
+  deleteCollection: {
+    id: 'course-authoring.library-authoring.collection.delete-menu-text',
+    defaultMessage: 'Delete',
+    description: 'Menu item to delete a collection.',
+  },
+  deleteCollectionConfirm: {
+    id: 'course-authoring.library-authoring.collection.delete-confirmation-text',
+    defaultMessage: 'Are you sure you want to delete collection: {collectionTitle}?',
+    description: 'Confirmation text to display before deleting collection',
+  },
+  deleteCollectionFailed: {
+    id: 'course-authoring.library-authoring.collection.delete-failed-error',
+    defaultMessage: 'Failed to delete collection',
+    description: 'Message to display on failure to delete collection',
+  },
+  deleteCollectionSuccess: {
+    id: 'course-authoring.library-authoring.collection.delete-error-success',
+    defaultMessage: 'Collection deleted',
+    description: 'Message to display on delete collection success',
+  },
+  undoDeleteCollectionToastAction: {
+    id: 'course-authoring.library-authoring.collection.undo-delete-collection-toast-button',
+    defaultMessage: 'Undo',
+    description: 'Toast message to undo deletion of collection',
+  },
+  undoDeleteCollectionToastMessage: {
+    id: 'course-authoring.library-authoring.collection.undo-delete-collection-toast-text',
+    defaultMessage: 'Undo successful',
+    description: 'Message to display on undo delete collection success',
+  },
+  undoDeleteCollectionToastFailed: {
+    id: 'course-authoring.library-authoring.collection.undo-delete-collection-failed',
+    defaultMessage: 'Failed to undo delete collection operation',
+    description: 'Message to display on failure to undo delete collection',
   },
 });
 

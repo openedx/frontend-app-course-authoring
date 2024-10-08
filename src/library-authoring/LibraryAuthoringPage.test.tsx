@@ -14,7 +14,6 @@ import mockEmptyResult from '../search-modal/__mocks__/empty-search-result.json'
 import {
   mockContentLibrary,
   mockGetCollectionMetadata,
-  mockLibraryBlockTypes,
   mockXBlockFields,
 } from './data/api.mocks';
 import { mockContentSearchConfig } from '../search-manager/data/api.mock';
@@ -25,7 +24,6 @@ import { getLibraryCollectionsApiUrl } from './data/api';
 mockGetCollectionMetadata.applyMock();
 mockContentSearchConfig.applyMock();
 mockContentLibrary.applyMock();
-mockLibraryBlockTypes.applyMock();
 mockXBlockFields.applyMock();
 mockBroadcastChannel();
 
@@ -82,6 +80,7 @@ describe('<LibraryAuthoringPage />', () => {
     initializeMocks();
 
     // The Meilisearch client-side API uses fetch, not Axios.
+    fetchMock.mockReset();
     fetchMock.post(searchEndpoint, (_url, req) => {
       const requestData = JSON.parse(req.body?.toString() ?? '');
       const query = requestData?.queries[0]?.q ?? '';
@@ -94,11 +93,6 @@ describe('<LibraryAuthoringPage />', () => {
       mockResult.results[0]?.hits.forEach((hit) => { hit._formatted = { ...hit }; });
       return mockResult;
     });
-  });
-
-  afterEach(() => {
-    jest.clearAllMocks();
-    fetchMock.mockReset();
   });
 
   const renderLibraryPage = async () => {

@@ -7,7 +7,6 @@ import {
   Dropdown,
 } from '@openedx/paragon';
 import { MoreVert } from '@openedx/paragon/icons';
-import { Link } from 'react-router-dom';
 
 import { updateClipboard } from '../../generic/data/api';
 import { ToastContext } from '../../generic/toast-context';
@@ -15,17 +14,17 @@ import { type ContentHit } from '../../search-manager';
 import { useLibraryContext } from '../common/context';
 import messages from './messages';
 import { STUDIO_CLIPBOARD_CHANNEL } from '../../constants';
-import { getEditUrl } from './utils';
 import BaseComponentCard from './BaseComponentCard';
+import { canEditComponent } from './ComponentEditorModal';
 
 type ComponentCardProps = {
   contentHit: ContentHit,
-  blockTypeDisplayName: string,
 };
 
 export const ComponentMenu = ({ usageKey }: { usageKey: string }) => {
   const intl = useIntl();
-  const editUrl = usageKey && getEditUrl(usageKey);
+  const { openComponentEditor } = useLibraryContext();
+  const canEdit = usageKey && canEditComponent(usageKey);
   const { showToast } = useContext(ToastContext);
   const [clipboardBroadcastChannel] = useState(() => new BroadcastChannel(STUDIO_CLIPBOARD_CHANNEL));
   const updateClipboardClick = () => {
@@ -49,7 +48,7 @@ export const ComponentMenu = ({ usageKey }: { usageKey: string }) => {
         data-testid="component-card-menu-toggle"
       />
       <Dropdown.Menu>
-        <Dropdown.Item {...(editUrl ? { as: Link, to: editUrl } : { disabled: true, to: '#' })}>
+        <Dropdown.Item {...(canEdit ? { onClick: () => openComponentEditor(usageKey) } : { disabled: true })}>
           <FormattedMessage {...messages.menuEdit} />
         </Dropdown.Item>
         <Dropdown.Item onClick={updateClipboardClick}>
@@ -63,7 +62,7 @@ export const ComponentMenu = ({ usageKey }: { usageKey: string }) => {
   );
 };
 
-const ComponentCard = ({ contentHit, blockTypeDisplayName } : ComponentCardProps) => {
+const ComponentCard = ({ contentHit } : ComponentCardProps) => {
   const {
     openComponentInfoSidebar,
   } = useLibraryContext();
@@ -83,7 +82,7 @@ const ComponentCard = ({ contentHit, blockTypeDisplayName } : ComponentCardProps
 
   return (
     <BaseComponentCard
-      type={blockType}
+      componentType={blockType}
       displayName={displayName}
       description={description}
       tags={tags}
@@ -92,7 +91,6 @@ const ComponentCard = ({ contentHit, blockTypeDisplayName } : ComponentCardProps
           <ComponentMenu usageKey={usageKey} />
         </ActionRow>
       )}
-      blockTypeDisplayName={blockTypeDisplayName}
       openInfoSidebar={() => openComponentInfoSidebar(usageKey)}
     />
   );

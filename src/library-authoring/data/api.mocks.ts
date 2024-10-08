@@ -1,50 +1,8 @@
 /* istanbul ignore file */
 import { mockContentTaxonomyTagsData } from '../../content-tags-drawer/data/api.mocks';
+import { getBlockType } from '../../generic/key-utils';
 import { createAxiosError } from '../../testUtils';
 import * as api from './api';
-
-/**
- * Mock for `getLibraryBlockTypes()`
- */
-export async function mockLibraryBlockTypes(): Promise<api.LibraryBlockType[]> {
-  return [
-    { blockType: 'about', displayName: 'overview' },
-    { blockType: 'annotatable', displayName: 'Annotation' },
-    { blockType: 'chapter', displayName: 'Section' },
-    { blockType: 'conditional', displayName: 'Conditional' },
-    { blockType: 'course', displayName: 'Empty' },
-    { blockType: 'course_info', displayName: 'Text' },
-    { blockType: 'discussion', displayName: 'Discussion' },
-    { blockType: 'done', displayName: 'Completion' },
-    { blockType: 'drag-and-drop-v2', displayName: 'Drag and Drop' },
-    { blockType: 'edx_sga', displayName: 'Staff Graded Assignment' },
-    { blockType: 'google-calendar', displayName: 'Google Calendar' },
-    { blockType: 'google-document', displayName: 'Google Document' },
-    { blockType: 'html', displayName: 'Text' },
-    { blockType: 'library', displayName: 'Library' },
-    { blockType: 'library_content', displayName: 'Randomized Content Block' },
-    { blockType: 'lti', displayName: 'LTI' },
-    { blockType: 'lti_consumer', displayName: 'LTI Consumer' },
-    { blockType: 'openassessment', displayName: 'Open Response Assessment' },
-    { blockType: 'poll', displayName: 'Poll' },
-    { blockType: 'problem', displayName: 'Problem' },
-    { blockType: 'scorm', displayName: 'Scorm module' },
-    { blockType: 'sequential', displayName: 'Subsection' },
-    { blockType: 'split_test', displayName: 'Content Experiment' },
-    { blockType: 'staffgradedxblock', displayName: 'Staff Graded Points' },
-    { blockType: 'static_tab', displayName: 'Empty' },
-    { blockType: 'survey', displayName: 'Survey' },
-    { blockType: 'thumbs', displayName: 'Thumbs' },
-    { blockType: 'unit', displayName: 'Unit' },
-    { blockType: 'vertical', displayName: 'Unit' },
-    { blockType: 'video', displayName: 'Video' },
-    { blockType: 'videoalpha', displayName: 'Video' },
-    { blockType: 'word_cloud', displayName: 'Word cloud' },
-  ];
-}
-mockLibraryBlockTypes.applyMock = () => {
-  jest.spyOn(api, 'getLibraryBlockTypes').mockImplementation(mockLibraryBlockTypes);
-};
 
 /**
  * Mock for `getContentLibrary()`
@@ -247,6 +205,7 @@ export async function mockXBlockFields(usageKey: string): Promise<api.XBlockFiel
     case thisMock.usageKeyNewHtml: return thisMock.dataNewHtml;
     case thisMock.usageKeyNewProblem: return thisMock.dataNewProblem;
     case thisMock.usageKeyNewVideo: return thisMock.dataNewVideo;
+    case thisMock.usageKeyThirdParty: return thisMock.dataThirdParty;
     default: throw new Error(`No mock has been set up for usageKey "${usageKey}"`);
   }
 }
@@ -277,6 +236,12 @@ mockXBlockFields.dataNewVideo = {
   data: '',
   metadata: { displayName: 'New Video' },
 } satisfies api.XBlockFields;
+mockXBlockFields.usageKeyThirdParty = 'lb:Axim:TEST:third_party:12345';
+mockXBlockFields.dataThirdParty = {
+  displayName: 'Third party XBlock',
+  data: '',
+  metadata: { displayName: 'Third party XBlock' },
+} satisfies api.XBlockFields;
 /** Apply this mock. Returns a spy object that can tell you if it's been called. */
 mockXBlockFields.applyMock = () => jest.spyOn(api, 'getXBlockFields').mockImplementation(mockXBlockFields);
 
@@ -297,6 +262,7 @@ export async function mockLibraryBlockMetadata(usageKey: string): Promise<api.Li
       throw createAxiosError({ code: 404, message: 'Not found.', path: api.getLibraryBlockMetadataUrl(usageKey) });
     case thisMock.usageKeyNeverPublished: return thisMock.dataNeverPublished;
     case thisMock.usageKeyPublished: return thisMock.dataPublished;
+    case thisMock.usageKeyThirdPartyXBlock: return thisMock.dataThirdPartyXBlock;
     case thisMock.usageKeyForTags: return thisMock.dataPublished;
     default: throw new Error(`No mock has been set up for usageKey "${usageKey}"`);
   }
@@ -332,6 +298,12 @@ mockLibraryBlockMetadata.dataPublished = {
   created: '2024-06-20T13:54:21Z',
   modified: '2024-06-21T13:54:21Z',
   tagsCount: 0,
+} satisfies api.LibraryBlockMetadata;
+mockLibraryBlockMetadata.usageKeyThirdPartyXBlock = mockXBlockFields.usageKeyThirdParty;
+mockLibraryBlockMetadata.dataThirdPartyXBlock = {
+  ...mockLibraryBlockMetadata.dataPublished,
+  id: mockLibraryBlockMetadata.usageKeyThirdPartyXBlock,
+  blockType: 'third_party',
 } satisfies api.LibraryBlockMetadata;
 mockLibraryBlockMetadata.usageKeyForTags = mockContentTaxonomyTagsData.largeTagsId;
 /** Apply this mock. Returns a spy object that can tell you if it's been called. */
@@ -374,3 +346,53 @@ mockGetCollectionMetadata.collectionData = {
 mockGetCollectionMetadata.applyMock = () => {
   jest.spyOn(api, 'getCollectionMetadata').mockImplementation(mockGetCollectionMetadata);
 };
+
+/**
+ * Mock for `getXBlockOLX()`
+ *
+ * This mock returns different data/responses depending on the ID of the block
+ * that you request. Use `mockXBlockOLX.applyMock()` to apply it to the whole
+ * test suite.
+ */
+export async function mockXBlockOLX(usageKey: string): Promise<string> {
+  const thisMock = mockXBlockOLX;
+  switch (usageKey) {
+    case thisMock.usageKeyHtml: return thisMock.olxHtml;
+    default: {
+      const blockType = getBlockType(usageKey);
+      return `<${blockType}>This is mock OLX for usageKey "${usageKey}"</${blockType}>`;
+    }
+  }
+}
+// Mock of a "regular" HTML (Text) block:
+mockXBlockOLX.usageKeyHtml = mockXBlockFields.usageKeyHtml;
+mockXBlockOLX.olxHtml = `
+  <html display_name="${mockXBlockFields.dataHtml.displayName}">
+    ${mockXBlockFields.dataHtml.data}
+  </html>
+`;
+/** Apply this mock. Returns a spy object that can tell you if it's been called. */
+mockXBlockOLX.applyMock = () => jest.spyOn(api, 'getXBlockOLX').mockImplementation(mockXBlockOLX);
+
+/**
+ * Mock for `setXBlockOLX()`
+ */
+export async function mockSetXBlockOLX(_usageKey: string, newOLX: string): Promise<string> {
+  return newOLX;
+}
+/** Apply this mock. Returns a spy object that can tell you if it's been called. */
+mockSetXBlockOLX.applyMock = () => jest.spyOn(api, 'setXBlockOLX').mockImplementation(mockSetXBlockOLX);
+
+/**
+ * Mock for `getXBlockAssets()`
+ *
+ * Use `getXBlockAssets.applyMock()` to apply it to the whole test suite.
+ */
+export async function mockXBlockAssets(): ReturnType<typeof api['getXBlockAssets']> {
+  return [
+    { path: 'static/image1.png', url: 'https://cdn.test.none/image1.png', size: 12_345_000 },
+    { path: 'static/data.csv', url: 'https://cdn.test.none/data.csv', size: 8_000 },
+  ];
+}
+/** Apply this mock. Returns a spy object that can tell you if it's been called. */
+mockXBlockAssets.applyMock = () => jest.spyOn(api, 'getXBlockAssets').mockImplementation(mockXBlockAssets);

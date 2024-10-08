@@ -9,11 +9,6 @@ const getApiBaseUrl = () => getConfig().STUDIO_BASE_URL;
 export const getContentLibraryApiUrl = (libraryId: string) => `${getApiBaseUrl()}/api/libraries/v2/${libraryId}/`;
 
 /**
- * Get the URL for getting block types of a library (what types can be created).
- */
-export const getLibraryBlockTypesUrl = (libraryId: string) => `${getApiBaseUrl()}/api/libraries/v2/${libraryId}/block_types/`;
-
-/**
  * Get the URL for create content in library.
  */
 export const getCreateLibraryBlockUrl = (libraryId: string) => `${getApiBaseUrl()}/api/libraries/v2/${libraryId}/blocks/`;
@@ -47,17 +42,25 @@ export const getXBlockFieldsApiUrl = (usageKey: string) => `${getApiBaseUrl()}/a
   */
 export const getXBlockOLXApiUrl = (usageKey: string) => `${getApiBaseUrl()}/api/libraries/v2/blocks/${usageKey}/olx/`;
 /**
+  * Get the URL for the xblock Assets List API
+  */
+export const getXBlockAssetsApiUrl = (usageKey: string) => `${getApiBaseUrl()}/api/libraries/v2/blocks/${usageKey}/assets/`;
+/**
  * Get the URL for the Library Collections API.
  */
 export const getLibraryCollectionsApiUrl = (libraryId: string) => `${getApiBaseUrl()}/api/libraries/v2/${libraryId}/collections/`;
 /**
- * Get the URL for the collection API.
+ * Get the URL for the collection detail API.
  */
 export const getLibraryCollectionApiUrl = (libraryId: string, collectionId: string) => `${getLibraryCollectionsApiUrl(libraryId)}${collectionId}/`;
 /**
  * Get the URL for the collection API.
  */
 export const getLibraryCollectionComponentApiUrl = (libraryId: string, collectionId: string) => `${getLibraryCollectionApiUrl(libraryId, collectionId)}components/`;
+/**
+ * Get the API URL for restoring deleted collection.
+ */
+export const getLibraryCollectionRestoreApiUrl = (libraryId: string, collectionId: string) => `${getLibraryCollectionApiUrl(libraryId, collectionId)}restore/`;
 
 export interface ContentLibrary {
   id: string;
@@ -183,14 +186,6 @@ export interface CreateLibraryCollectionDataRequest {
 export type UpdateCollectionComponentsRequest = Partial<CreateLibraryCollectionDataRequest>;
 
 /**
- * Fetch the list of XBlock types that can be added to this library
- */
-export async function getLibraryBlockTypes(libraryId: string): Promise<LibraryBlockType[]> {
-  const { data } = await getAuthenticatedHttpClient().get(getLibraryBlockTypesUrl(libraryId));
-  return camelCaseObject(data);
-}
-
-/**
  * Fetch a content library by its ID.
  */
 export async function getContentLibrary(libraryId: string): Promise<ContentLibrary> {
@@ -314,9 +309,29 @@ export async function createCollection(libraryId: string, collectionData: Create
 /**
  * Fetch the OLX for the given XBlock.
  */
+// istanbul ignore next
 export async function getXBlockOLX(usageKey: string): Promise<string> {
   const { data } = await getAuthenticatedHttpClient().get(getXBlockOLXApiUrl(usageKey));
   return data.olx;
+}
+
+/**
+ * Set the OLX for the given XBlock.
+ * Returns the OLX as it was actually saved.
+ */
+// istanbul ignore next
+export async function setXBlockOLX(usageKey: string, newOLX: string): Promise<string> {
+  const { data } = await getAuthenticatedHttpClient().post(getXBlockOLXApiUrl(usageKey), { olx: newOLX });
+  return data.olx;
+}
+
+/**
+ * Fetch the asset (static file) list for the given XBlock.
+ */
+// istanbul ignore next
+export async function getXBlockAssets(usageKey: string): Promise<{ path: string; url: string; size: number }[]> {
+  const { data } = await getAuthenticatedHttpClient().get(getXBlockAssetsApiUrl(usageKey));
+  return data.files;
 }
 
 /**
@@ -346,4 +361,20 @@ export async function updateCollectionComponents(libraryId: string, collectionId
   await getAuthenticatedHttpClient().patch(getLibraryCollectionComponentApiUrl(libraryId, collectionId), {
     usage_keys: usageKeys,
   });
+}
+
+/**
+ * Soft-Delete collection.
+ */
+export async function deleteCollection(libraryId: string, collectionId: string) {
+  const client = getAuthenticatedHttpClient();
+  await client.delete(getLibraryCollectionApiUrl(libraryId, collectionId));
+}
+
+/**
+ * Restore soft-deleted collection
+ */
+export async function restoreCollection(libraryId: string, collectionId: string) {
+  const client = getAuthenticatedHttpClient();
+  await client.post(getLibraryCollectionRestoreApiUrl(libraryId, collectionId));
 }

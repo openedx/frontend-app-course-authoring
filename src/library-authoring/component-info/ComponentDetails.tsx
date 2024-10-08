@@ -6,7 +6,7 @@ import Loading from '../../generic/Loading';
 import { useLibraryContext } from '../common/context';
 import { useLibraryBlockMetadata } from '../data/apiHooks';
 import HistoryWidget from '../generic/history-widget';
-import { ComponentDeveloperInfo } from './ComponentDeveloperInfo';
+import { ComponentAdvancedInfo } from './ComponentAdvancedInfo';
 import messages from './messages';
 
 const ComponentDetails = () => {
@@ -51,10 +51,7 @@ const ComponentDetails = () => {
           {...componentMetadata}
         />
       </div>
-      {
-        // istanbul ignore next: this is only shown in development
-        (process.env.NODE_ENV === 'development' ? <ComponentDeveloperInfo usageKey={usageKey} /> : null)
-      }
+      <ComponentAdvancedInfo usageKey={usageKey} />
     </Stack>
   );
 };

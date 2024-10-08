@@ -3,12 +3,19 @@ import {
   render as baseRender,
   screen,
 } from '../../testUtils';
+import {
+  mockContentLibrary,
+  mockLibraryBlockMetadata,
+  mockXBlockAssets,
+  mockXBlockOLX,
+} from '../data/api.mocks';
 import { LibraryProvider } from '../common/context';
-import { mockContentLibrary, mockLibraryBlockMetadata } from '../data/api.mocks';
 import ComponentDetails from './ComponentDetails';
 
 mockContentLibrary.applyMock();
 mockLibraryBlockMetadata.applyMock();
+mockXBlockAssets.applyMock();
+mockXBlockOLX.applyMock();
 
 const { libraryId: mockLibraryId } = mockContentLibrary;
 

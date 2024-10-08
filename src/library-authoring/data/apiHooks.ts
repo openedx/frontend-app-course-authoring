@@ -14,7 +14,6 @@ import {
   type XBlockFields,
   type UpdateXBlockFieldsRequest,
   getContentLibrary,
-  getLibraryBlockTypes,
   createLibraryBlock,
   getContentLibraryV2List,
   commitLibraryChanges,
@@ -31,6 +30,10 @@ import {
   updateCollectionComponents,
   type CreateLibraryCollectionDataRequest,
   getCollectionMetadata,
+  deleteCollection,
+  restoreCollection,
+  setXBlockOLX,
+  getXBlockAssets,
 } from './api';
 
 export const libraryQueryPredicate = (query: Query, libraryId: string): boolean => {
@@ -59,12 +62,6 @@ export const libraryAuthoringQueryKeys = {
     'list',
     ...(customParams ? [customParams] : []),
   ],
-  contentLibraryBlockTypes: (contentLibraryId?: string) => [
-    ...libraryAuthoringQueryKeys.all,
-    ...libraryAuthoringQueryKeys.contentLibrary(contentLibraryId),
-    'content',
-    'libraryBlockTypes',
-  ],
   collection: (libraryId?: string, collectionId?: string) => [
     ...libraryAuthoringQueryKeys.all,
     libraryId,
@@ -82,6 +79,8 @@ export const xblockQueryKeys = {
   xblockFields: (usageKey: string) => [...xblockQueryKeys.xblock(usageKey), 'fields'],
   /** OLX (XML representation of the fields/content) */
   xblockOLX: (usageKey: string) => [...xblockQueryKeys.xblock(usageKey), 'OLX'],
+  /** assets (static files) */
+  xblockAssets: (usageKey: string) => [...xblockQueryKeys.xblock(usageKey), 'assets'],
   componentMetadata: (usageKey: string) => [...xblockQueryKeys.xblock(usageKey), 'componentMetadata'],
 };
 
@@ -110,16 +109,6 @@ export const useContentLibrary = (libraryId: string | undefined) => (
     queryKey: libraryAuthoringQueryKeys.contentLibrary(libraryId),
     queryFn: () => getContentLibrary(libraryId!),
     enabled: libraryId !== undefined,
-  })
-);
-
-/**
- *  Hook to fetch block types of a library.
- */
-export const useLibraryBlockTypes = (libraryId: string) => (
-  useQuery({
-    queryKey: libraryAuthoringQueryKeys.contentLibraryBlockTypes(libraryId),
-    queryFn: () => getLibraryBlockTypes(libraryId),
   })
 );
 
@@ -272,11 +261,39 @@ export const useCreateLibraryCollection = (libraryId: string) => {
   });
 };
 
-/* istanbul ignore next */ // This is only used in developer builds, and the associated UI doesn't work in test or prod
+/** Get the OLX source of a library component */
 export const useXBlockOLX = (usageKey: string) => (
   useQuery({
     queryKey: xblockQueryKeys.xblockOLX(usageKey),
     queryFn: () => getXBlockOLX(usageKey),
+    enabled: !!usageKey,
+  })
+);
+
+/**
+ * Update the OLX of a library component (advanced feature)
+ */
+export const useUpdateXBlockOLX = (usageKey: string) => {
+  const contentLibraryId = getLibraryId(usageKey);
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (newOLX: string) => setXBlockOLX(usageKey, newOLX),
+    onSuccess: (olxFromServer) => {
+      queryClient.setQueryData(xblockQueryKeys.xblockOLX(usageKey), olxFromServer);
+      // Reload the other data for this component:
+      invalidateComponentData(queryClient, contentLibraryId, usageKey);
+      // And the description and display name etc. may have changed, so refresh everything in the library too:
+      queryClient.invalidateQueries({ queryKey: libraryAuthoringQueryKeys.contentLibrary(contentLibraryId) });
+      queryClient.invalidateQueries({ predicate: (query) => libraryQueryPredicate(query, contentLibraryId) });
+    },
+  });
+};
+
+/** Get the list of assets (static files) attached to a library component */
+export const useXBlockAssets = (usageKey: string) => (
+  useQuery({
+    queryKey: xblockQueryKeys.xblockAssets(usageKey),
+    queryFn: () => getXBlockAssets(usageKey),
     enabled: !!usageKey,
   })
 );
@@ -320,11 +337,38 @@ export const useUpdateCollectionComponents = (libraryId?: string, collectionId?:
       }
       return undefined;
     },
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    onSettled: (_data, _error, _variables) => {
+    onSettled: () => {
       if (libraryId !== undefined && collectionId !== undefined) {
         queryClient.invalidateQueries({ predicate: (query) => libraryQueryPredicate(query, libraryId) });
       }
+    },
+  });
+};
+
+/**
+ * Use this mutation to soft delete collections in a library
+ */
+export const useDeleteCollection = (libraryId: string, collectionId: string) => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async () => deleteCollection(libraryId, collectionId),
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: libraryAuthoringQueryKeys.contentLibrary(libraryId) });
+      queryClient.invalidateQueries({ predicate: (query) => libraryQueryPredicate(query, libraryId) });
+    },
+  });
+};
+
+/**
+ * Use this mutation to restore soft deleted collections in a library
+ */
+export const useRestoreCollection = (libraryId: string, collectionId: string) => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async () => restoreCollection(libraryId, collectionId),
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: libraryAuthoringQueryKeys.contentLibrary(libraryId) });
+      queryClient.invalidateQueries({ predicate: (query) => libraryQueryPredicate(query, libraryId) });
     },
   });
 };
