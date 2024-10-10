@@ -44,15 +44,14 @@ describe('<ComponentInfo> Sidebar', () => {
     expect(editButton).toBeDisabled();
   });
 
-  it('should show a disabled "Edit" button when the library is read-only', async () => {
+  it('should not show a "Edit" button when the library is read-only', async () => {
     initializeMocks();
     render(
       <ComponentInfo />,
       withLibraryId(mockContentLibrary.libraryIdReadOnly, mockLibraryBlockMetadata.usageKeyPublished),
     );
 
-    const editButton = await screen.findByRole('button', { name: /Edit component/ });
-    expect(editButton).toBeDisabled();
+    expect(screen.queryByRole('button', { name: /Edit component/ })).not.toBeInTheDocument();
   });
 
   it('should show a working "Edit" button for a normal component', async () => {
