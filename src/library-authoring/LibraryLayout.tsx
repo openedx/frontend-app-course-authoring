@@ -1,7 +1,6 @@
 import {
-  Route,
-  Routes,
   useParams,
+  useMatch,
 } from 'react-router-dom';
 
 import LibraryAuthoringPage from './LibraryAuthoringPage';
@@ -11,7 +10,11 @@ import LibraryCollectionPage from './collections/LibraryCollectionPage';
 import { ComponentEditorModal } from './components/ComponentEditorModal';
 
 const LibraryLayout = () => {
-  const { libraryId, collectionId } = useParams();
+  const { libraryId } = useParams();
+
+  const match = useMatch('/library/:libraryId/collection/:collectionId');
+
+  const collectionId = match?.params.collectionId;
 
   if (libraryId === undefined) {
     // istanbul ignore next - This shouldn't be possible; it's just here to satisfy the type checker.
@@ -19,17 +22,12 @@ const LibraryLayout = () => {
   }
 
   return (
-    <LibraryProvider libraryId={libraryId} collectionId={collectionId}>
-      <Routes>
-        <Route
-          path="collection/:collectionId"
-          element={<LibraryCollectionPage />}
-        />
-        <Route
-          path="*"
-          element={<LibraryAuthoringPage />}
-        />
-      </Routes>
+    <LibraryProvider key={collectionId} libraryId={libraryId} collectionId={collectionId}>
+      {collectionId ? (
+        <LibraryCollectionPage />
+      ) : (
+        <LibraryAuthoringPage />
+      )}
       <CreateCollectionModal />
       <ComponentEditorModal />
     </LibraryProvider>

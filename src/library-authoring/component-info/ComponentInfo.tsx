@@ -35,7 +35,6 @@ const ComponentInfo = () => {
   } = useAddComponentToCourse();
 
   if (addComponentToCourseSuccess) {
-    console.log('Component added to course');
     // FIXME: Add function to message parent that component was added to course
   }
 

@@ -22,9 +22,10 @@ export interface LibraryContextData {
   libraryData?: ContentLibrary;
   readOnly: boolean;
   isLoadingLibraryData: boolean;
+  collectionId: string | undefined;
+  setCollectionId: (collectionId?: string) => void;
   // Whether we're in "component picker" mode
   componentPickerMode: boolean;
-  homeCollectionId?: string;
   // Sidebar stuff - only one sidebar is active at any given time:
   sidebarBodyComponent: SidebarBodyComponentId | null;
   closeLibrarySidebar: () => void;
@@ -71,11 +72,12 @@ interface LibraryProviderProps {
 export const LibraryProvider = ({
   children,
   libraryId,
-  collectionId,
+  collectionId: collectionIdProp,
   componentPickerMode = false,
   sidebarCollectionId: sideBarCollectionIdProp,
   sidebarComponentUsageKey: sidebarComponentUsageKeyProp,
 }: LibraryProviderProps) => {
+  const [collectionId, setCollectionId] = useState(collectionIdProp);
   const [sidebarBodyComponent, setSidebarBodyComponent] = useState<SidebarBodyComponentId | null>(null);
   const [sidebarComponentUsageKey, setSidebarComponentUsageKey] = useState<string | undefined>(
     sidebarComponentUsageKeyProp,
@@ -125,6 +127,7 @@ export const LibraryProvider = ({
     libraryId,
     libraryData,
     collectionId,
+    setCollectionId,
     readOnly,
     isLoadingLibraryData,
     componentPickerMode,
@@ -145,6 +148,7 @@ export const LibraryProvider = ({
   }), [
     libraryId,
     collectionId,
+    setCollectionId,
     libraryData,
     readOnly,
     isLoadingLibraryData,

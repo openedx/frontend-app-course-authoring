@@ -2,12 +2,25 @@ import { useIntl } from '@edx/frontend-platform/i18n';
 import { Button, Stepper } from '@openedx/paragon';
 import { useState } from 'react';
 
-import { LibraryProvider } from '../common/context';
+import { LibraryProvider, useLibraryContext } from '../common/context';
 import LibraryAuthoringPage from '../LibraryAuthoringPage';
+import LibraryCollectionPage from '../collections/LibraryCollectionPage';
 import SelectLibrary from './SelectLibrary';
 import messages from './messages';
 
-const ComponentPicker = () => {
+const InnerComponentPicker = () => {
+  const {
+    collectionId,
+  } = useLibraryContext();
+
+  if (collectionId) {
+    return <LibraryCollectionPage />;
+  }
+  return <LibraryAuthoringPage />;
+};
+
+// eslint-disable-next-line import/prefer-default-export
+export const ComponentPicker = () => {
   const intl = useIntl();
 
   const [currentStep, setCurrentStep] = useState('select-library');
@@ -23,7 +36,7 @@ const ComponentPicker = () => {
 
       <Stepper.Step eventKey="pick-components" title="Pick some components">
         <LibraryProvider libraryId={selectedLibrary} componentPickerMode>
-          <LibraryAuthoringPage />
+          <InnerComponentPicker />
         </LibraryProvider>
       </Stepper.Step>
 
@@ -44,5 +57,3 @@ const ComponentPicker = () => {
     </Stepper>
   );
 };
-
-export default ComponentPicker;

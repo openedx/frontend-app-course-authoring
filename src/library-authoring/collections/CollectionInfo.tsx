@@ -16,32 +16,39 @@ const CollectionInfo = () => {
   const intl = useIntl();
   const navigate = useNavigate();
 
-  const { libraryId, sidebarCollectionId: collectionId, componentPickerMode } = useLibraryContext();
+  const {
+    libraryId,
+    collectionId,
+    setCollectionId,
+    sidebarCollectionId,
+    componentPickerMode,
+  } = useLibraryContext();
 
-  const url = `/library/${libraryId}/collection/${collectionId}/`;
+  const url = `/library/${libraryId}/collection/${sidebarCollectionId}/`;
   const urlMatch = useMatch(url);
+
+  const showOpenCollectionButton = !urlMatch && collectionId !== sidebarCollectionId;
+
+  if (!sidebarCollectionId) {
+    throw new Error('sidebarCollectionId is required');
+  }
 
   const handleOpenCollection = useCallback(() => {
     if (!componentPickerMode) {
       navigate(url);
     } else {
-      // FIXME: Set state here
+      setCollectionId(sidebarCollectionId);
     }
   }, [componentPickerMode, url]);
 
-  if (!collectionId) {
-    return null;
-  }
-
   return (
     <Stack>
-      {!urlMatch && (
+      {showOpenCollectionButton && (
         <div className="d-flex flex-wrap">
           <Button
             onClick={handleOpenCollection}
             variant="outline-primary"
             className="m-1 text-nowrap flex-grow-1"
-            disabled={!!urlMatch}
           >
             {intl.formatMessage(messages.openCollectionButton)}
           </Button>
