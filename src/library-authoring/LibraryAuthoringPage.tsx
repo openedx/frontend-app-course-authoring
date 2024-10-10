@@ -110,8 +110,12 @@ const HeaderActions = () => {
   );
 };
 
-const SubHeaderTitle = ({ title, showReadOnlyBadge }: { title: string, showReadOnlyBadge: boolean }) => {
+const SubHeaderTitle = ({ title }: { title: string }) => {
   const intl = useIntl();
+
+  const { readOnly, componentPickerMode } = useLibraryContext();
+
+  const showReadOnlyBadge = readOnly && !componentPickerMode;
 
   return (
     <Stack direction="vertical">
@@ -202,16 +206,9 @@ const LibraryAuthoringPage = () => {
             extraFilter={`context_key = "${libraryId}"`}
           >
             <SubHeader
-              title={(
-                <SubHeaderTitle
-                  title={libraryData.title}
-                  showReadOnlyBadge={!componentPickerMode && !libraryData.canEditLibrary}
-                />
-              )}
+              title={<SubHeaderTitle title={libraryData.title} />}
               subtitle={intl.formatMessage(messages.headingSubtitle)}
-              headerActions={(
-                <HeaderActions />
-              )}
+              headerActions={<HeaderActions />}
             />
             <SearchKeywordsField className="w-50" />
             <div className="d-flex mt-3 align-items-center">

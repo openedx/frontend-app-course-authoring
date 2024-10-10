@@ -207,7 +207,6 @@ describe('<LibraryAuthoringPage />', () => {
     await waitFor(() => { expect(fetchMock).toHaveFetchedTimes(1, searchEndpoint, 'post'); });
 
     expect(await screen.findByText('Content library')).toBeInTheDocument();
-    screen.logTestingPlaygroundURL();
     expect(screen.getByText('You have not added any content to this library yet.')).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /add component/i })).not.toBeInTheDocument();
     expect(screen.getByText('Read Only')).toBeInTheDocument();

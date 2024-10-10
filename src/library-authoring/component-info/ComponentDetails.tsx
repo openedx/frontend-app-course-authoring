@@ -51,7 +51,7 @@ const ComponentDetails = () => {
           {...componentMetadata}
         />
       </div>
-      <ComponentAdvancedInfo usageKey={usageKey} />
+      <ComponentAdvancedInfo />
     </Stack>
   );
 };
