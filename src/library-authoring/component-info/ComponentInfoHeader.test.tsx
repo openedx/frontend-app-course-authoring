@@ -24,7 +24,7 @@ const xBlockFields = {
 
 const render = (libraryId: string = mockLibraryId) => baseRender(<ComponentInfoHeader />, {
   extraWrapper: ({ children }) => (
-    <LibraryProvider libraryId={libraryId} componentUsageKey={usageKey}>
+    <LibraryProvider libraryId={libraryId} sidebarComponentUsageKey={usageKey}>
       {children}
     </LibraryProvider>
   ),

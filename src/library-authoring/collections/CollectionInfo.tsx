@@ -5,7 +5,8 @@ import {
   Tab,
   Tabs,
 } from '@openedx/paragon';
-import { Link, useMatch } from 'react-router-dom';
+import { useCallback } from 'react';
+import { useNavigate, useMatch } from 'react-router-dom';
 
 import { useLibraryContext } from '../common/context';
 import CollectionDetails from './CollectionDetails';
@@ -13,11 +14,20 @@ import messages from './messages';
 
 const CollectionInfo = () => {
   const intl = useIntl();
+  const navigate = useNavigate();
 
-  const { libraryId, currentCollectionId: collectionId } = useLibraryContext();
+  const { libraryId, sidebarCollectionId: collectionId, componentPickerMode } = useLibraryContext();
 
   const url = `/library/${libraryId}/collection/${collectionId}/`;
   const urlMatch = useMatch(url);
+
+  const handleOpenCollection = useCallback(() => {
+    if (!componentPickerMode) {
+      navigate(url);
+    } else {
+      // FIXME: Set state here
+    }
+  }, [componentPickerMode, url]);
 
   if (!collectionId) {
     return null;
@@ -28,8 +38,7 @@ const CollectionInfo = () => {
       {!urlMatch && (
         <div className="d-flex flex-wrap">
           <Button
-            as={Link}
-            to={url}
+            onClick={handleOpenCollection}
             variant="outline-primary"
             className="m-1 text-nowrap flex-grow-1"
             disabled={!!urlMatch}

@@ -70,10 +70,6 @@ const HeaderActions = () => {
     readOnly,
   } = useLibraryContext();
 
-  if (!readOnly) {
-    return null;
-  }
-
   const infoSidebarIsOpen = () => (
     sidebarBodyComponent === SidebarBodyComponentId.Info
   );
@@ -105,7 +101,7 @@ const HeaderActions = () => {
           iconBefore={Add}
           variant="primary rounded-0"
           onClick={openAddContentSidebar}
-          disabled={!canEditLibrary}
+          disabled={readOnly}
         >
           {intl.formatMessage(messages.newContentButton)}
         </Button>

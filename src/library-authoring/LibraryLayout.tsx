@@ -11,7 +11,7 @@ import LibraryCollectionPage from './collections/LibraryCollectionPage';
 import { ComponentEditorModal } from './components/ComponentEditorModal';
 
 const LibraryLayout = () => {
-  const { libraryId } = useParams();
+  const { libraryId, collectionId } = useParams();
 
   if (libraryId === undefined) {
     // istanbul ignore next - This shouldn't be possible; it's just here to satisfy the type checker.
@@ -19,7 +19,7 @@ const LibraryLayout = () => {
   }
 
   return (
-    <LibraryProvider libraryId={libraryId}>
+    <LibraryProvider libraryId={libraryId} collectionId={collectionId}>
       <Routes>
         <Route
           path="collection/:collectionId"

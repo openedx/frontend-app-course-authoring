@@ -22,7 +22,7 @@ const ComponentInfo = () => {
   const { showToast } = useContext(ToastContext);
 
   const {
-    currentComponentUsageKey: usageKey,
+    sidebarComponentUsageKey: usageKey,
     readOnly,
     openComponentEditor,
     componentPickerMode,

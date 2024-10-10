@@ -19,7 +19,7 @@ const CollectionInfoHeader = () => {
 
   const {
     libraryId,
-    currentCollectionId: collectionId,
+    sidebarCollectionId: collectionId,
     readOnly,
   } = useLibraryContext();
 

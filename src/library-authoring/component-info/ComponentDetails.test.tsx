@@ -21,7 +21,7 @@ const { libraryId: mockLibraryId } = mockContentLibrary;
 
 const render = (usageKey: string) => baseRender(<ComponentDetails />, {
   extraWrapper: ({ children }) => (
-    <LibraryProvider libraryId={mockLibraryId} componentUsageKey={usageKey}>
+    <LibraryProvider libraryId={mockLibraryId} sidebarComponentUsageKey={usageKey}>
       {children}
     </LibraryProvider>
   ),

@@ -12,7 +12,7 @@ import messages from './messages';
 const ComponentDetails = () => {
   const intl = useIntl();
 
-  const { currentComponentUsageKey: usageKey } = useLibraryContext();
+  const { sidebarComponentUsageKey: usageKey } = useLibraryContext();
 
   // istanbul ignore if: this should never happen
   if (!usageKey) {

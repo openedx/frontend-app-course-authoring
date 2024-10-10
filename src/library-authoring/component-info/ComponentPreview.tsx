@@ -33,7 +33,7 @@ const ComponentPreview = () => {
   const intl = useIntl();
 
   const [isModalOpen, openModal, closeModal] = useToggle();
-  const { currentComponentUsageKey: usageKey } = useLibraryContext();
+  const { sidebarComponentUsageKey: usageKey } = useLibraryContext();
 
   // istanbul ignore if: this should never happen
   if (!usageKey) {

@@ -18,7 +18,7 @@ const ComponentInfoHeader = () => {
   const [inputIsActive, setIsActive] = useState(false);
 
   const {
-    currentComponentUsageKey: usageKey,
+    sidebarComponentUsageKey: usageKey,
     readOnly,
   } = useLibraryContext();
 

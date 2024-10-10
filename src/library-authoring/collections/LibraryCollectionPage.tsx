@@ -80,7 +80,7 @@ const SubHeaderTitle = ({
           variant="primary"
         />
       </Stack>
-      { !canEditLibrary && (
+      {!canEditLibrary && (
         <div>
           <Badge variant="primary" style={{ fontSize: '50%' }}>
             {intl.formatMessage(messages.readOnlyBadge)}
@@ -194,7 +194,7 @@ const LibraryCollectionPage = () => {
         </Container>
         <StudioFooter />
       </div>
-      { !!sidebarBodyComponent && (
+      {!!sidebarBodyComponent && (
         <div className="library-authoring-sidebar box-shadow-left-1 bg-white" data-testid="library-sidebar">
           <LibrarySidebar />
         </div>

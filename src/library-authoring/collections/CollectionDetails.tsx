@@ -37,7 +37,7 @@ const BlockCount = ({
 };
 
 const CollectionStatsWidget = () => {
-  const { libraryId, currentCollectionId: collectionId } = useLibraryContext();
+  const { libraryId, sidebarCollectionId: collectionId } = useLibraryContext();
 
   const { data: blockTypes } = useGetBlockTypes([
     `context_key = "${libraryId}"`,
@@ -98,7 +98,7 @@ const CollectionDetails = () => {
   const { showToast } = useContext(ToastContext);
   const {
     libraryId,
-    currentCollectionId: collectionId,
+    sidebarCollectionId: collectionId,
     readOnly,
   } = useLibraryContext();
 

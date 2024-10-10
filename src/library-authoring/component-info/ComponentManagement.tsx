@@ -13,7 +13,7 @@ import { useContentTaxonomyTagsData } from '../../content-tags-drawer/data/apiHo
 
 const ComponentManagement = () => {
   const intl = useIntl();
-  const { currentComponentUsageKey: usageKey, readOnly } = useLibraryContext();
+  const { sidebarComponentUsageKey: usageKey, readOnly } = useLibraryContext();
 
   if (!usageKey) {
     throw new Error('usageKey is required');

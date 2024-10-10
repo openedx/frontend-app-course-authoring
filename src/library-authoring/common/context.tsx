@@ -1,5 +1,10 @@
 import { useToggle } from '@openedx/paragon';
-import React from 'react';
+import React, {
+  useCallback,
+  useContext,
+  useMemo,
+  useState,
+} from 'react';
 
 import type { ContentLibrary } from '../data/api';
 import { useContentLibrary } from '../data/apiHooks';
@@ -19,20 +24,21 @@ export interface LibraryContextData {
   isLoadingLibraryData: boolean;
   // Whether we're in "component picker" mode
   componentPickerMode: boolean;
+  homeCollectionId?: string;
   // Sidebar stuff - only one sidebar is active at any given time:
   sidebarBodyComponent: SidebarBodyComponentId | null;
   closeLibrarySidebar: () => void;
   openAddContentSidebar: () => void;
   openInfoSidebar: () => void;
   openComponentInfoSidebar: (usageKey: string) => void;
-  currentComponentUsageKey?: string;
+  sidebarComponentUsageKey?: string;
   // "Create New Collection" modal
   isCreateCollectionModalOpen: boolean;
   openCreateCollectionModal: () => void;
   closeCreateCollectionModal: () => void;
   // Current collection
   openCollectionInfoSidebar: (collectionId: string) => void;
-  currentCollectionId?: string;
+  sidebarCollectionId?: string;
   // Editor modal - for editing some component
   /** If the editor is open and the user is editing some component, this is its usageKey */
   componentBeingEdited: string | undefined;
@@ -53,9 +59,10 @@ const LibraryContext = React.createContext<LibraryContextData | undefined>(undef
 interface LibraryProviderProps {
   children?: React.ReactNode;
   libraryId: string;
-  componentPickerMode?: boolean;
   collectionId?: string;
-  componentUsageKey?: string;
+  componentPickerMode?: boolean;
+  sidebarCollectionId?: string;
+  sidebarComponentUsageKey?: string;
 }
 
 /**
@@ -64,46 +71,49 @@ interface LibraryProviderProps {
 export const LibraryProvider = ({
   children,
   libraryId,
-  componentPickerMode = false,
   collectionId,
-  componentUsageKey,
+  componentPickerMode = false,
+  sidebarCollectionId: sideBarCollectionIdProp,
+  sidebarComponentUsageKey: sidebarComponentUsageKeyProp,
 }: LibraryProviderProps) => {
-  const [sidebarBodyComponent, setSidebarBodyComponent] = React.useState<SidebarBodyComponentId | null>(null);
-  const [currentComponentUsageKey, setCurrentComponentUsageKey] = React.useState<string | undefined>(componentUsageKey);
-  const [currentCollectionId, setcurrentCollectionId] = React.useState<string | undefined>(collectionId);
+  const [sidebarBodyComponent, setSidebarBodyComponent] = useState<SidebarBodyComponentId | null>(null);
+  const [sidebarComponentUsageKey, setSidebarComponentUsageKey] = useState<string | undefined>(
+    sidebarComponentUsageKeyProp,
+  );
+  const [sidebarCollectionId, setSidebarCollectionId] = useState<string | undefined>(sideBarCollectionIdProp);
   const [isCreateCollectionModalOpen, openCreateCollectionModal, closeCreateCollectionModal] = useToggle(false);
-  const [componentBeingEdited, openComponentEditor] = React.useState<string | undefined>();
-  const closeComponentEditor = React.useCallback(() => openComponentEditor(undefined), []);
+  const [componentBeingEdited, openComponentEditor] = useState<string | undefined>();
+  const closeComponentEditor = useCallback(() => openComponentEditor(undefined), []);
 
-  const resetSidebar = React.useCallback(() => {
-    setCurrentComponentUsageKey(undefined);
-    setcurrentCollectionId(undefined);
+  const resetSidebar = useCallback(() => {
+    setSidebarComponentUsageKey(undefined);
+    setSidebarCollectionId(undefined);
     setSidebarBodyComponent(null);
   }, []);
 
-  const closeLibrarySidebar = React.useCallback(() => {
+  const closeLibrarySidebar = useCallback(() => {
     resetSidebar();
-    setCurrentComponentUsageKey(undefined);
+    setSidebarComponentUsageKey(undefined);
   }, []);
-  const openAddContentSidebar = React.useCallback(() => {
+  const openAddContentSidebar = useCallback(() => {
     resetSidebar();
     setSidebarBodyComponent(SidebarBodyComponentId.AddContent);
   }, []);
-  const openInfoSidebar = React.useCallback(() => {
+  const openInfoSidebar = useCallback(() => {
     resetSidebar();
     setSidebarBodyComponent(SidebarBodyComponentId.Info);
   }, []);
-  const openComponentInfoSidebar = React.useCallback(
+  const openComponentInfoSidebar = useCallback(
     (usageKey: string) => {
       resetSidebar();
-      setCurrentComponentUsageKey(usageKey);
+      setSidebarComponentUsageKey(usageKey);
       setSidebarBodyComponent(SidebarBodyComponentId.ComponentInfo);
     },
     [],
   );
-  const openCollectionInfoSidebar = React.useCallback((newCollectionId: string) => {
+  const openCollectionInfoSidebar = useCallback((newCollectionId: string) => {
     resetSidebar();
-    setcurrentCollectionId(newCollectionId);
+    setSidebarCollectionId(newCollectionId);
     setSidebarBodyComponent(SidebarBodyComponentId.CollectionInfo);
   }, []);
 
@@ -111,9 +121,10 @@ export const LibraryProvider = ({
 
   const readOnly = componentPickerMode || !libraryData?.canEditLibrary;
 
-  const context = React.useMemo<LibraryContextData>(() => ({
+  const context = useMemo<LibraryContextData>(() => ({
     libraryId,
     libraryData,
+    collectionId,
     readOnly,
     isLoadingLibraryData,
     componentPickerMode,
@@ -122,17 +133,18 @@ export const LibraryProvider = ({
     openAddContentSidebar,
     openInfoSidebar,
     openComponentInfoSidebar,
-    currentComponentUsageKey,
+    sidebarComponentUsageKey,
     isCreateCollectionModalOpen,
     openCreateCollectionModal,
     closeCreateCollectionModal,
     openCollectionInfoSidebar,
-    currentCollectionId,
+    sidebarCollectionId,
     componentBeingEdited,
     openComponentEditor,
     closeComponentEditor,
   }), [
     libraryId,
+    collectionId,
     libraryData,
     readOnly,
     isLoadingLibraryData,
@@ -142,12 +154,12 @@ export const LibraryProvider = ({
     openAddContentSidebar,
     openInfoSidebar,
     openComponentInfoSidebar,
-    currentComponentUsageKey,
+    sidebarComponentUsageKey,
     isCreateCollectionModalOpen,
     openCreateCollectionModal,
     closeCreateCollectionModal,
     openCollectionInfoSidebar,
-    currentCollectionId,
+    sidebarCollectionId,
     componentBeingEdited,
     openComponentEditor,
     closeComponentEditor,
@@ -161,7 +173,7 @@ export const LibraryProvider = ({
 };
 
 export function useLibraryContext(): LibraryContextData {
-  const ctx = React.useContext(LibraryContext);
+  const ctx = useContext(LibraryContext);
   if (ctx === undefined) {
     /* istanbul ignore next */
     throw new Error('useLibraryContext() was used in a component without a <LibraryProvider> ancestor.');
