@@ -372,3 +372,9 @@ export const useRestoreCollection = (libraryId: string, collectionId: string) =>
     },
   });
 };
+
+export const useAddComponentToCourse = () => (
+  useMutation({
+    mutationFn: async () => {},
+  })
+);

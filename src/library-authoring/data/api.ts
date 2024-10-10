@@ -214,7 +214,8 @@ export async function createLibraryBlock({
  */
 export async function updateLibraryMetadata(libraryData: UpdateLibraryDataRequest): Promise<ContentLibrary> {
   const client = getAuthenticatedHttpClient();
-  const { data } = await client.patch(getContentLibraryApiUrl(libraryData.id), libraryData);
+  const { id: libraryId, ...updateData } = libraryData;
+  const { data } = await client.patch(getContentLibraryApiUrl(libraryId), updateData);
 
   return camelCaseObject(data);
 }
