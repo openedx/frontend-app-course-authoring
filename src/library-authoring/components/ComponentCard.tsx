@@ -94,6 +94,7 @@ const ComponentCard = ({ contentHit }: ComponentCardProps) => {
   } = useAddComponentToCourse();
 
   if (addComponentToCourseSuccess) {
+    // TODO: Call endpoint to add component to course
     window.parent.postMessage('closeComponentPicker', '*');
   }
 
