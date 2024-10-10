@@ -94,7 +94,7 @@ const ComponentCard = ({ contentHit }: ComponentCardProps) => {
   } = useAddComponentToCourse();
 
   if (addComponentToCourseSuccess) {
-    // FIXME: Add function to message parent that component was added to course
+    window.parent.postMessage('closeComponentPicker', '*');
   }
 
   if (addComponentToCourseError) {
