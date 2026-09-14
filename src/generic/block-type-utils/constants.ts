@@ -33,6 +33,11 @@ export const COMPONENT_TYPES = {
   video: 'video',
   dragAndDrop: 'drag-and-drop-v2',
   pdf: 'pdf',
+  games: 'games',
+  invideoquiz: 'invideoquiz',
+  lti: 'lti_consumer',
+  scorm: 'scorm',
+  h5p: 'h5pxblock',
 };
 
 export const UNIT_TYPE_ICONS_MAP: Record<string, React.ComponentType> = {
