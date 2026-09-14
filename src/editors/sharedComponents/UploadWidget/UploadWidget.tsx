@@ -36,6 +36,7 @@ export interface UploadWidgetProps<T = string> {
   blockId: string;
   isLibrary: boolean;
   saveField?: (args: FieldSaverArgs<T>) => Promise<unknown>;
+  setIsBusy?: (val: boolean) => void;
 }
 
 type LibraryAsset = { path: string; };
@@ -53,6 +54,7 @@ const UploadWidget = ({
   blockId,
   isLibrary,
   saveField,
+  setIsBusy,
 }: UploadWidgetProps<string>) => {
   const intl = useIntl();
   const [manualMode, setManualMode] = useState(false);
@@ -62,6 +64,7 @@ const UploadWidget = ({
   const mutation = useAssetUpload({ blockId, isLibrary });
   const saver = saveField ||
     ((args: FieldSaverArgs<string>) => void args.control.setValue(args.value)); // eslint-disable-line no-void
+  const toggleBusy = setIsBusy || (() => undefined);
 
   const onAddFile = (files: File[]) => {
     const file = files[0];
@@ -70,6 +73,7 @@ const UploadWidget = ({
       urlFieldControl.setError(intl.formatMessage(messages.fileTooLarge));
       return;
     }
+    toggleBusy(true);
     mutation.mutateAsync(file).then((result: AssetResponse) => {
       let value: string;
       if (isLibrary) {
@@ -86,6 +90,7 @@ const UploadWidget = ({
       urlFieldControl.setError(intl.formatMessage(messages.uploadError));
     }).finally(() => {
       mutation.reset();
+      toggleBusy(false);
     });
   };
   const fileInput = useFileInput({ onAddFile, setSelectedRows, setAddOpen });
