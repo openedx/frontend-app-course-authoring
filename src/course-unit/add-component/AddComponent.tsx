@@ -125,14 +125,14 @@ const AddComponent = ({
     closeSelectLibraryContentModal();
   }, [selectedComponents]);
 
-  const onXBlockSave = useCallback(/* istanbul ignore next */ () => {
+  const onXBlockSave = useCallback(/* istanbul ignore next */() => {
     closeXBlockEditorModal();
     closeVideoSelectorModal();
     sendMessageToIframe(messageTypes.refreshXBlock, null);
     dispatch(fetchCourseSectionVerticalData(blockId, sequenceId));
   }, [closeXBlockEditorModal, closeVideoSelectorModal, sendMessageToIframe]);
 
-  const onXBlockCancel = useCallback(/* istanbul ignore next */ () => {
+  const onXBlockCancel = useCallback(/* istanbul ignore next */() => {
     // ignoring tests because it triggers when someone closes the editor which has a separate store
     closeXBlockEditorModal();
     closeVideoSelectorModal();
@@ -166,7 +166,7 @@ const AddComponent = ({
       case COMPONENT_TYPES.video:
         handleCreateNewCourseXBlock(
           { type, parentLocator: blockId },
-          /* istanbul ignore next */ ({ courseKey, locator }) => {
+          /* istanbul ignore next */({ courseKey, locator }) => {
             setCourseId(courseKey);
             setBlockType(type);
             setNewBlockId(locator);
@@ -196,7 +196,16 @@ const AddComponent = ({
         if (moduleName === COMPONENT_TYPES.pdf && useNewPdfEditor) {
           handleCreateNewCourseXBlock(
             { type: moduleName, parentLocator: blockId },
-            /* istanbul ignore next */
+      /* istanbul ignore next */({ courseKey, locator }) => {
+              setCourseId(courseKey);
+              setBlockType(moduleName);
+              setNewBlockId(locator);
+              showXBlockEditorModal();
+            },
+          );
+        } else if (moduleName === COMPONENT_TYPES.invideoquiz) {
+          handleCreateNewCourseXBlock(
+            { type: moduleName, category: moduleName, parentLocator: blockId },
             ({ courseKey, locator }) => {
               setCourseId(courseKey);
               setBlockType(moduleName);
@@ -205,9 +214,14 @@ const AddComponent = ({
             },
           );
         } else {
-          handleCreateNewCourseXBlock({ type: moduleName!, category: moduleName!, parentLocator: blockId });
+          handleCreateNewCourseXBlock({
+            type: moduleName!,
+            category: moduleName!,
+            parentLocator: blockId,
+          });
         }
         break;
+
       case COMPONENT_TYPES.openassessment:
         handleCreateNewCourseXBlock({ boilerplate: moduleName, category: type, parentLocator: blockId });
         break;
@@ -216,7 +230,7 @@ const AddComponent = ({
           type,
           boilerplate: moduleName,
           parentLocator: blockId,
-        }, /* istanbul ignore next */ ({ courseKey, locator }) => {
+        }, /* istanbul ignore next */({ courseKey, locator }) => {
           setCourseId(courseKey);
           setBlockType(type);
           setNewBlockId(locator);

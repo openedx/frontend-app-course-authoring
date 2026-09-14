@@ -423,6 +423,84 @@ export const apiMethods = {
       urls.validateNumericInputUrl({ studioEndpointUrl }),
       data,
     ),
+  getGamesSettings: ({
+    studioEndpointUrl,
+    blockId,
+  }) => post(
+    urls.handlerUrl({ studioEndpointUrl, blockId, handlerName: 'get_settings' }),
+    {},
+  ),
+  saveGamesSettings: ({
+    studioEndpointUrl,
+    blockId,
+    gameType,
+    isShuffled,
+    cards,
+    hasTimer,
+    title,
+  }) => {
+    // Transform cards to include order and format properly
+    // For matching games, exclude image fields
+    const formattedCards = cards.map((card, index) => {
+      const baseCard = {
+        term: card.term || '',
+        definition: card.definition || '',
+        order: index + 1,
+      };
+      if (gameType === 'flashcards') {
+        return {
+          ...baseCard,
+          term_image: card.term_image || '',
+          definition_image: card.definition_image || '',
+        };
+      }
+      return baseCard;
+    });
+
+    const payload: any = {
+      display_name: title,
+      game_type: gameType,
+      is_shuffled: isShuffled,
+      cards: formattedCards,
+    };
+
+    // Only include has_timer for matching game type
+    if (gameType === 'matching') {
+      payload.has_timer = hasTimer;
+    }
+
+    return post(
+      urls.handlerUrl({ studioEndpointUrl, blockId, handlerName: 'save_settings' }),
+      payload,
+    );
+  },
+  deleteGamesImage: ({
+    studioEndpointUrl,
+    blockId,
+    key,
+  }) => post(
+    urls.handlerUrl({ studioEndpointUrl, blockId, handlerName: 'delete_image_handler' }),
+    { key },
+  ),
+  saveInVideoQuizSettings: ({
+    studioEndpointUrl,
+    blockId,
+    displayName,
+    videoId,
+    timemap,
+    jumpBack,
+  }) => post(
+    urls.handlerUrl({ studioEndpointUrl, blockId, handlerName: 'submit_studio_edits' }),
+    {
+      values: {
+        display_name: displayName,
+        video_id: videoId,
+        timemap,
+        jump_back: jumpBack,
+      },
+      defaults: [],
+    },
+  ),
 };
 
 export default apiMethods;
